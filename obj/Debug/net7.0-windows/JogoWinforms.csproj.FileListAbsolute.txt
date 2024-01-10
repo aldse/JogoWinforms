@@ -1,0 +1,14 @@
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\bin\Debug\net7.0-windows\JogoWinforms.exe
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\bin\Debug\net7.0-windows\JogoWinforms.deps.json
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\bin\Debug\net7.0-windows\JogoWinforms.runtimeconfig.json
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\bin\Debug\net7.0-windows\JogoWinforms.dll
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\bin\Debug\net7.0-windows\JogoWinforms.pdb
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.AssemblyInfoInputs.cache
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.AssemblyInfo.cs
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.csproj.CoreCompileInputs.cache
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.dll
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\refint\JogoWinforms.dll
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.pdb
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\JogoWinforms.genruntimeconfig.cache
+C:\Users\disrct\Desktop\Jogo\JogoWinforms\obj\Debug\net7.0-windows\ref\JogoWinforms.dll
