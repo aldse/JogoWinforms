@@ -17,11 +17,6 @@ class Program
             Dock = DockStyle.Fill,
         };
 
-        var timer = new Timer
-        {
-            Interval = 20,
-        };
-
         var form = new Form
         {
             WindowState = FormWindowState.Maximized,
@@ -34,51 +29,35 @@ class Program
             bmp = new Bitmap(pb.Width, pb.Height);
             g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
-            pb.Image = bmp;
-
-            timer.Start();
-        };
-
-        timer.Tick += (o, e) =>
-        {
-            g.Clear(Color.Black);
 
             g.DrawString("Jogo Winforms", form.Font, Brushes.WhiteSmoke, Point.Empty);
-
+            
             int TamanhoDoQuadrado = Math.Min(pb.Width, pb.Height) - 500;
-            int margemCima = 40;
-            int margemLados = 100;
 
-            int tamX = (pb.Width - TamanhoDoQuadrado - margemLados) / 2;
-            int tamY = (pb.Height - TamanhoDoQuadrado - margemCima) / 2;
+            int tamX = (pb.Width - TamanhoDoQuadrado) / 2;
+            int tamY = (pb.Height - TamanhoDoQuadrado) / 2;
 
-            // linhas horizontais da grade
-            for (int i = 0; i < 7; i++)
+            // Quadrado 
+            g.DrawRectangle(Pens.Black, tamX, tamY, TamanhoDoQuadrado, TamanhoDoQuadrado);
+
+            Random randnum = new Random();
+            int num = randnum.Next(2, 40);
+
+            int tamanhoCelula = TamanhoDoQuadrado / num;
+
+            // Grade aleatória
+            for (int i = 0; i < num; i++)
             {
-                int y = tamY + i * TamanhoDoQuadrado / 6;
-                g.DrawLine(Pens.YellowGreen, tamX, y, tamX + TamanhoDoQuadrado + margemLados, y);
-            }
-
-            // linhas verticais da grade
-            for (int i = 0; i < 7; i++)
-            {
-                int x = tamX + i * (TamanhoDoQuadrado + margemLados) / 6;
-                g.DrawLine(Pens.YellowGreen, x, tamY, x, tamY + TamanhoDoQuadrado);
-            }
-            // Desenha marcadores (pontos) no centro de cada quadradinho
-            int tamanhoDoPonto = 60;
-
-            for (int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < 6; j++)
+                for (int j = 0; j < num; j++)
                 {
-                    int x = tamX + (TamanhoDoQuadrado + margemLados) / 12;
-                    int y = tamY + (TamanhoDoQuadrado / 12);
+                    int x = tamX + i * tamanhoCelula;
+                    int y = tamY + j * tamanhoCelula;
 
-                    g.FillEllipse(Brushes.Red, x - tamanhoDoPonto / 2, y - tamanhoDoPonto / 2, tamanhoDoPonto, tamanhoDoPonto);
+                    g.DrawRectangle(Pens.YellowGreen, x, y, tamanhoCelula, tamanhoCelula);
                 }
             }
-            pb.Refresh();
+
+            pb.Image = bmp;
         };
 
         Application.Run(form);
