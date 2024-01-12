@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace JogoWinforms;
 public class Jogo
-{
+{   //? indica que o tipo é anulável 
     Color?[][] dados;
     Color?[][] jogadas;
     Color? atual = null;
@@ -19,11 +19,20 @@ public class Jogo
         carregar(15, 10);
     }
 
-    public void Jogar(int x, int y)
+    public void Jogar(int x, int y, PictureBox pb)
     {
-        //vai de um ao outro
-        //não deixa passar aonde ja passou ou aode esta ocupado
-        //cores iguais se encaixam
+        int TamanhoDoQuadrado = Math.Min(pb.Width, pb.Height) - 300;
+
+        int tamX = (pb.Width - TamanhoDoQuadrado) / 2;
+        int tamY = (pb.Height - TamanhoDoQuadrado) / 2;
+        int num = 15;
+
+        int tamanhoCelula = TamanhoDoQuadrado / num;
+
+        x = (x - tamX) / tamanhoCelula;
+        y = (y - tamY) / tamanhoCelula;
+        
+        //Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
         if (atual == null)
         {
             if (jogadas[x][y] != null)
@@ -32,40 +41,29 @@ public class Jogo
                 jogadaAtual.Add((x, y));
             }
         }
-       else
-    {
-        if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y))
+        else
         {
-            // Adiciona os pontos da linha quando a jogada é válida
-            if (jogadaAtual.Count > 1)
+            if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y))
             {
-                pontosLinha.AddRange(jogadaAtual.Select(p => new Point(p.x, p.y)));
+                // Adiciona os pontos da linha quando a jogada é válida
+                if (jogadaAtual.Count > 1)
+                    pontosLinha.AddRange(jogadaAtual.Select(p => new Point(p.x, p.y)));
+
+                jogadas[x][y] = atual;
+                jogadaAtual.Add((x, y));
             }
-
-            jogadas[x][y] = atual;
-            dados[x][y] = atual;
-            atual = null;
-            jogadaAtual.Add((x, y));
-
-            // Limpa a jogada atual se a quantidade de elementos for ímpar
-            if (jogadaAtual.Count % 2 != 0)
-                LimparJogadaAtual();
         }
     }
-}
     private void LimparJogadaAtual()
     {
-        foreach (var (i, j) in jogadaAtual)
-        {
-            jogadas[i][j] = null;
-        }
         jogadaAtual.Clear();
     }
 
     public void ValidarJogada()
     {
         //validar coisas da jogada: se foi concluido o trajeto de uma bolinha ate a outra sem bater em outra linha traçada
-        pontosLinha.Clear();
+        atual = null;
+        LimparJogadaAtual();
     }
 
 
@@ -83,7 +81,27 @@ public class Jogo
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
 
-        // Grade aleatória
+        // // Pontos
+        // foreach (var ponto in pontosLinha)
+        // {
+        //     int x1 = tamX + ponto.X * tamanhoCelula + tamanhoCelula / 2;
+        //     int y1 = tamY + ponto.Y * tamanhoCelula + tamanhoCelula / 2;
+
+        //     if (pontosLinha.Contains(new Point(ponto.X + 1, ponto.Y)))
+        //     {
+        //         int x2 = x1 + tamanhoCelula;
+        //         int y2 = y1;
+        //         g.DrawLine(Pens.DimGray, x1, y1, x2, y2);
+        //     }
+
+        //     if (pontosLinha.Contains(new Point(ponto.X, ponto.Y + 1)))
+        //     {
+        //         int x2 = x1;
+        //         int y2 = y1 + tamanhoCelula;
+        //         g.DrawLine(Pens.DimGray, x1, y1, x2, y2);
+        //     }
+        // }
+
         for (int i = 0; i < num; i++)
         {
             for (int j = 0; j < num; j++)
@@ -111,14 +129,24 @@ public class Jogo
                     g.FillRectangle(new SolidBrush(cor),
                         tamanhoCelula * i + tamX,
                         tamanhoCelula * j + tamY,
-                        tamanhoCelula, tamanhoCelula
+                        tamanhoCelula,
+                        tamanhoCelula
                     );
                 }
             }
         }
-        if (pontosLinha.Count > 1)
+
+        if (!atual.HasValue)
+            return;
+        
+        var corJogada = new SolidBrush(atual.Value);
+        foreach (var jogada in jogadaAtual)
         {
-            g.DrawLines(Pens.Red, pontosLinha.ToArray());
+            g.FillRectangle(corJogada,
+                tamX + jogada.x * tamanhoCelula,
+                tamY + jogada.y * tamanhoCelula,
+                tamanhoCelula, tamanhoCelula
+            );
         }
     }
 

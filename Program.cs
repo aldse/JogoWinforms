@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using JogoWinforms;
 class Program
 {
@@ -13,8 +14,8 @@ class Program
         Bitmap bmp = null;
         Graphics g = null;
 
-        Point clicado = Point.Empty;
-        bool isMouseDown = new Boolean();
+        Point clicado = Point.Empty; //empty = vazio
+        bool isMouseClicado = new Boolean();
 
         Timer timer = new Timer()
         {
@@ -41,38 +42,28 @@ class Program
             pb.Refresh();
         };
 
-        form.MouseDown += (o, e) =>
+        pb.MouseDown += (o, e) =>
         {
             //deve chamar o com Jogar() e o jogo.Desenhar();
             clicado = e.Location;
-            isMouseDown = true;
-            jogo.Jogar((int)clicado.X, (int)clicado.Y);
+            isMouseClicado = true;
+            jogo.Jogar((int)e.X, (int)e.Y, pb);
             jogo.Desenhar(pb, g);
         };
 
-        form.MouseUp += (o, e) =>
+        pb.MouseUp += (o, e) =>
         {
             //com ValidarJogada()
+            clicado = Point.Empty;
+            isMouseClicado = false;
             jogo.ValidarJogada();
         };
 
-        form.MouseMove += (o, e) =>
+        pb.MouseMove += (o, e) =>
         {
-            if (isMouseDown && clicado != Point.Empty)
-            {
-                // Verifique se há uma jogada válida antes de executar
-                if (jogo.VerificarMovimento((int)e.X, (int)e.Y))
-                {
-                    jogo.Jogar((int)e.X, (int)e.Y);
-
-                    // Atualize a exibição chamando o método Desenhar
-                    jogo.Desenhar(pb, g);
-                    pb.Refresh();
-                }
-            }
+            if (isMouseClicado)
+                jogo.Jogar((int)e.X, (int)e.Y, pb);
         };
-
-
 
         form.KeyDown += (o, e) =>
         {
