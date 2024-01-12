@@ -13,6 +13,7 @@ public class Jogo
     Color? atual = null;
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
 
+    List<Point> pontosLinha = new List<Point>();
     public void Carregar()
     {
         carregar(15, 10);
@@ -23,15 +24,53 @@ public class Jogo
         //vai de um ao outro
         //não deixa passar aonde ja passou ou aode esta ocupado
         //cores iguais se encaixam
+        if (atual == null)
+        {
+            if (jogadas[x][y] != null)
+            {
+                atual = jogadas[x][y];
+                jogadaAtual.Add((x, y));
+            }
+        }
+       else
+    {
+        if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y))
+        {
+            // Adiciona os pontos da linha quando a jogada é válida
+            if (jogadaAtual.Count > 1)
+            {
+                pontosLinha.AddRange(jogadaAtual.Select(p => new Point(p.x, p.y)));
+            }
+
+            jogadas[x][y] = atual;
+            dados[x][y] = atual;
+            atual = null;
+            jogadaAtual.Add((x, y));
+
+            // Limpa a jogada atual se a quantidade de elementos for ímpar
+            if (jogadaAtual.Count % 2 != 0)
+                LimparJogadaAtual();
+        }
+    }
+}
+    private void LimparJogadaAtual()
+    {
+        foreach (var (i, j) in jogadaAtual)
+        {
+            jogadas[i][j] = null;
+        }
+        jogadaAtual.Clear();
     }
 
     public void ValidarJogada()
     {
-
+        //validar coisas da jogada: se foi concluido o trajeto de uma bolinha ate a outra sem bater em outra linha traçada
+        pontosLinha.Clear();
     }
 
+
     public void Desenhar(PictureBox pb, Graphics g)
-    { 
+    {
         int TamanhoDoQuadrado = Math.Min(pb.Width, pb.Height) - 300;
 
         int tamX = (pb.Width - TamanhoDoQuadrado) / 2;
@@ -57,7 +96,7 @@ public class Jogo
                 if (dados[i][j] is not null)
                 {
                     var cor = dados[i][j].Value;
-                    
+
                     g.FillEllipse(new SolidBrush(cor),
                         tamanhoCelula * i + tamX + 10,
                         tamanhoCelula * j + tamY + 10,
@@ -77,6 +116,19 @@ public class Jogo
                 }
             }
         }
+        if (pontosLinha.Count > 1)
+        {
+            g.DrawLines(Pens.Red, pontosLinha.ToArray());
+        }
+    }
+
+    public bool VerificarMovimento(int x, int y)
+    {
+        if (jogadaAtual.Count == 0)
+            return true;
+
+        var (ultimoX, ultimoY) = jogadaAtual.Last();
+        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1;
     }
 
     private void carregar(int tamanho, int qtdBolas)
@@ -96,12 +148,12 @@ public class Jogo
             (int x, int y) = pegarEspacoVazio(tamanho, alet);
             jogadas[x][y] = color;
             dados[x][y] = color;
-            
+
             (x, y) = pegarEspacoVazio(tamanho, alet);
             jogadas[x][y] = color;
             dados[x][y] = color;
         }
-        
+
     }
 
     private (int x, int y) pegarEspacoVazio(int tamanho, Random alet)
@@ -123,5 +175,5 @@ public class Jogo
         var azul = alet.Next(255);
         return Color.FromArgb(vermelho, verde, azul);
     }
-    
+
 }

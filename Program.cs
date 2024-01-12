@@ -2,7 +2,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using JogoWinforms;
-
 class Program
 {
     [STAThread]
@@ -13,7 +12,12 @@ class Program
         Jogo jogo = new Jogo();
         Bitmap bmp = null;
         Graphics g = null;
-        Timer timer = new Timer() {
+
+        Point clicado = Point.Empty;
+        bool isMouseDown = new Boolean();
+
+        Timer timer = new Timer()
+        {
             Interval = 20
         };
 
@@ -39,25 +43,42 @@ class Program
 
         form.MouseDown += (o, e) =>
         {
-            //com Jogar()
-            // jogo.Jogar();
+            //deve chamar o com Jogar() e o jogo.Desenhar();
+            clicado = e.Location;
+            isMouseDown = true;
+            jogo.Jogar((int)clicado.X, (int)clicado.Y);
+            jogo.Desenhar(pb, g);
         };
 
         form.MouseUp += (o, e) =>
         {
             //com ValidarJogada()
+            jogo.ValidarJogada();
         };
 
         form.MouseMove += (o, e) =>
         {
-            //com Jogar()
+            if (isMouseDown && clicado != Point.Empty)
+            {
+                // Verifique se há uma jogada válida antes de executar
+                if (jogo.VerificarMovimento((int)e.X, (int)e.Y))
+                {
+                    jogo.Jogar((int)e.X, (int)e.Y);
+
+                    // Atualize a exibição chamando o método Desenhar
+                    jogo.Desenhar(pb, g);
+                    pb.Refresh();
+                }
+            }
         };
+
+
 
         form.KeyDown += (o, e) =>
         {
             if (e.KeyCode == Keys.Escape)
                 Application.Exit();
-            
+
             if (e.KeyCode == Keys.Space)
                 jogo.Carregar();
         };
@@ -72,7 +93,7 @@ class Program
             pb.Image = bmp;
             timer.Start();
         };
-        
+
         Application.Run(form);
     }
 }
