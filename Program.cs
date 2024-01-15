@@ -37,7 +37,7 @@ class Program
         timer.Tick += delegate
         {
             g.Clear(Color.Black);
-            g.DrawString("Jogo Winforms", form.Font, Brushes.WhiteSmoke, Point.Empty);
+            // g.DrawString("Jogo Winforms", form.Font, Brushes.WhiteSmoke, Point.Empty);
             jogo.Desenhar(pb, g);
             pb.Refresh();
         };
