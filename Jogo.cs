@@ -18,6 +18,7 @@ public class Jogo
     {
         carregar(15, 10);
     }
+    List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
 
     public void Jogar(int x, int y, PictureBox pb)
     {
@@ -31,7 +32,7 @@ public class Jogo
 
         x = (x - tamX) / tamanhoCelula;
         y = (y - tamY) / tamanhoCelula;
-        
+
         //Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
         if (atual == null)
         {
@@ -51,10 +52,31 @@ public class Jogo
 
                 jogadas[x][y] = atual;
                 jogadaAtual.Add((x, y));
+                LimparJogadaAtual(); //Limpeza de Variáveis de Jogada Atual:
             }
         }
+
     }
-    private void LimparJogadaAtual()
+    public bool SemCruzamentos(int x, int y)
+    {
+        if (jogadaAtual.Count == 0)
+            return true;
+
+        var (ultimoX, ultimoY) = jogadaAtual.Last();
+
+        var novoTraco = (start: new Point(ultimoX, ultimoY), end: new Point(x, y));
+
+        foreach (var tracoExistente in linhaTracada)   // Verificar se o novo segmento cruza com algum segmento já existente
+        {
+            if (Cruzam(novoTraco, tracoExistente))
+            {
+                return false;  // Cruzamento detectado, movimento inválido
+            }
+        }
+
+        return true;
+    }
+    public void LimparJogadaAtual()
     {
         jogadaAtual.Clear();
     }
@@ -62,6 +84,14 @@ public class Jogo
     public void ValidarJogada()
     {
         //validar coisas da jogada: se foi concluido o trajeto de uma bolinha ate a outra sem bater em outra linha traçada
+        if (atual.HasValue && jogadaAtual.Count > 1)
+        {
+            for (int i = 1; i < jogadaAtual.Count; i++)
+            {
+                var pntinicial = new Point(jogadaAtual[i - 1].x, jogadaAtual[i - 1].y);
+                var pntfinal = new Point(jogadaAtual[i].x, jogadaAtual[i].y);
+            }
+        }
         atual = null;
         LimparJogadaAtual();
     }
@@ -138,7 +168,7 @@ public class Jogo
 
         if (!atual.HasValue)
             return;
-        
+
         var corJogada = new SolidBrush(atual.Value);
         foreach (var jogada in jogadaAtual)
         {
@@ -150,14 +180,20 @@ public class Jogo
         }
     }
 
-    public bool VerificarMovimento(int x, int y)
+    public bool VerificarMovimento(int x, int y) // se o movimento de uma bola para outra é válido 
     {
         if (jogadaAtual.Count == 0)
             return true;
 
         var (ultimoX, ultimoY) = jogadaAtual.Last();
-        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1;
+        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1 && SemCruzamentos(x, y);
     }
+
+    private bool Cruzam((Point start, Point end) segmento1, (Point start, Point end) segmento2)
+    {
+        return true;
+    }
+
 
     private void carregar(int tamanho, int qtdBolas)
     {
