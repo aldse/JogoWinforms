@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using JogoWinforms;
 class Program
 {
@@ -44,16 +43,13 @@ class Program
 
         pb.MouseDown += (o, e) =>
         {
-            //deve chamar o com Jogar() e o jogo.Desenhar();
             clicado = e.Location;
             isMouseClicado = true;
             jogo.Jogar((int)e.X, (int)e.Y, pb);
-            jogo.Desenhar(pb, g);
         };
 
         pb.MouseUp += (o, e) =>
         {
-            //com ValidarJogada()
             clicado = Point.Empty;
             isMouseClicado = false;
             jogo.ValidarJogada();

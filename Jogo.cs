@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime;
 using System.Collections.Generic;
 
 namespace JogoWinforms;
@@ -12,15 +11,14 @@ public class Jogo
     Color?[][] jogadas;
     Color? atual = null;
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
-
     List<Point> pontosLinha = new List<Point>();
-    public void Carregar()
+    List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
+    public void Carregar() //mudar o tamanho e a quantidade para random
     {
         carregar(15, 10);
     }
-    List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
 
-    public void Jogar(int x, int y, PictureBox pb)
+    public void Jogar(int x, int y, PictureBox pb)  //Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
     {
         int TamanhoDoQuadrado = Math.Min(pb.Width, pb.Height) - 300;
 
@@ -33,7 +31,6 @@ public class Jogo
         x = (x - tamX) / tamanhoCelula;
         y = (y - tamY) / tamanhoCelula;
 
-        //Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
         if (atual == null)
         {
             if (jogadas[x][y] != null)
@@ -44,58 +41,122 @@ public class Jogo
         }
         else
         {
-            if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y))
+            if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y) && !CruzamComLinhaTraçada(x, y))
             {
-                // Adiciona os pontos da linha quando a jogada é válida
                 if (jogadaAtual.Count > 1)
+                {
                     pontosLinha.AddRange(jogadaAtual.Select(p => new Point(p.x, p.y)));
+                    linhaTracada.Add((pontosLinha.First(), pontosLinha.Last()));
+                }
 
                 jogadas[x][y] = atual;
                 jogadaAtual.Add((x, y));
-                LimparJogadaAtual(); //Limpeza de Variáveis de Jogada Atual:
             }
         }
-
     }
-    public bool SemCruzamentos(int x, int y)
+    public void ValidarJogada() //chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
+    {   
+        atual = null;
+        
+        
+
+        
+        LimparJogadaAtual();
+    }
+
+    /// <summary>
+    /// Procura se existe uma bolinha em volta de uma posição (x, y) e retorna
+    /// verdadeiro se a jogada na posição (x, y) possui a mesma cor que a da bolinha.
+    /// </summary>
+    private bool temBolinhaPerto(int x, int y)
+    {
+        var cor = jogadas[x][y];
+
+        return false;
+    }
+
+    public void ValidarPontoFinal(int x, int y) // ideia era remove a última linha traçada se o ponto final não for válido, chama no validaJogada
+    {
+        if (jogadaAtual.Count > 1)
+        {
+            var (ultimoX, ultimoY) = jogadaAtual.Last();
+            if (!PontoFinalValido(ultimoX, ultimoY))
+            {
+                linhaTracada.RemoveAt(linhaTracada.Count - 1);  
+            }
+        }
+    }
+    public bool VerificarMovimento(int x, int y) // se o movimento de uma bola para outra é válido 
     {
         if (jogadaAtual.Count == 0)
             return true;
 
         var (ultimoX, ultimoY) = jogadaAtual.Last();
-
-        var novoTraco = (start: new Point(ultimoX, ultimoY), end: new Point(x, y));
-
-        foreach (var tracoExistente in linhaTracada)   // Verificar se o novo segmento cruza com algum segmento já existente
+        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1 && SemCruzamentos(x, y);
+    }
+    private bool CruzamComLinhaTraçada(int x, int y)
+    {
+        foreach (var tracoExistente in linhaTracada)
         {
-            if (Cruzam(novoTraco, tracoExistente))
+            if (Cruzam((tracoExistente.incial, tracoExistente.final), (new Point(jogadaAtual.Last().x, jogadaAtual.Last().y), new Point(x, y))))
             {
-                return false;  // Cruzamento detectado, movimento inválido
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool SemCruzamentos(int x, int y)
+    {
+        if (jogadaAtual.Count == 0)
+            return true;
+
+        foreach (var tracoExistente in linhaTracada)
+        {
+            if (Cruzam((tracoExistente.incial, tracoExistente.final), (new Point(jogadaAtual.Last().x, jogadaAtual.Last().y), new Point(x, y))))
+            {
+                return true;
             }
         }
 
         return true;
     }
-    public void LimparJogadaAtual()
-    {
-        jogadaAtual.Clear();
-    }
 
-    public void ValidarJogada()
+    private bool Cruzam((Point comeco, Point fim) segmento1, (Point comeco, Point fim) segmento2)
     {
-        //validar coisas da jogada: se foi concluido o trajeto de uma bolinha ate a outra sem bater em outra linha traçada
-        if (atual.HasValue && jogadaAtual.Count > 1)
+        float a1 = segmento1.fim.Y - segmento1.comeco.Y;
+        float b1 = segmento1.comeco.X - segmento1.fim.X;
+        float c1 = a1 * segmento1.comeco.X + b1 * segmento1.comeco.Y;
+
+        float a2 = segmento2.fim.Y - segmento2.comeco.Y;
+        float b2 = segmento2.comeco.X - segmento2.fim.X;
+        float c2 = a2 * segmento2.comeco.X + b2 * segmento2.comeco.Y;
+
+        float delta = a1 * b2 - a2 * b1;
+
+        if (delta == 0)
         {
-            for (int i = 1; i < jogadaAtual.Count; i++)
-            {
-                var pntinicial = new Point(jogadaAtual[i - 1].x, jogadaAtual[i - 1].y);
-                var pntfinal = new Point(jogadaAtual[i].x, jogadaAtual[i].y);
-            }
+            return false; 
         }
-        atual = null;
-        LimparJogadaAtual();
+
+        float intersectX = (b2 * c1 - b1 * c2) / delta;
+        float intersectY = (a1 * c2 - a2 * c1) / delta;
+
+        bool dentroSegmento1 = intersectX >= Math.Min(segmento1.comeco.X, segmento1.fim.X)
+                            && intersectX <= Math.Max(segmento1.comeco.X, segmento1.fim.X)
+                            && intersectY >= Math.Min(segmento1.comeco.Y, segmento1.fim.Y)
+                            && intersectY <= Math.Max(segmento1.comeco.Y, segmento1.fim.Y);
+
+        bool dentroSegmento2 = intersectX >= Math.Min(segmento2.comeco.X, segmento2.fim.X)
+                            && intersectX <= Math.Max(segmento2.comeco.X, segmento2.fim.X)
+                            && intersectY >= Math.Min(segmento2.comeco.Y, segmento2.fim.Y)
+                            && intersectY <= Math.Max(segmento2.comeco.Y, segmento2.fim.Y);
+
+        return dentroSegmento1 && dentroSegmento2;
     }
 
+    public void LimparJogadaAtual()
+        => jogadaAtual.Clear();
 
     public void Desenhar(PictureBox pb, Graphics g)
     {
@@ -110,27 +171,6 @@ public class Jogo
         int num = 15;
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
-
-        // // Pontos
-        // foreach (var ponto in pontosLinha)
-        // {
-        //     int x1 = tamX + ponto.X * tamanhoCelula + tamanhoCelula / 2;
-        //     int y1 = tamY + ponto.Y * tamanhoCelula + tamanhoCelula / 2;
-
-        //     if (pontosLinha.Contains(new Point(ponto.X + 1, ponto.Y)))
-        //     {
-        //         int x2 = x1 + tamanhoCelula;
-        //         int y2 = y1;
-        //         g.DrawLine(Pens.DimGray, x1, y1, x2, y2);
-        //     }
-
-        //     if (pontosLinha.Contains(new Point(ponto.X, ponto.Y + 1)))
-        //     {
-        //         int x2 = x1;
-        //         int y2 = y1 + tamanhoCelula;
-        //         g.DrawLine(Pens.DimGray, x1, y1, x2, y2);
-        //     }
-        // }
 
         for (int i = 0; i < num; i++)
         {
@@ -166,34 +206,42 @@ public class Jogo
             }
         }
 
-        if (!atual.HasValue)
+        if (!atual.HasValue) //retorna um valor atual
             return;
 
         var corJogada = new SolidBrush(atual.Value);
-        foreach (var jogada in jogadaAtual)
+
+        if (jogadaAtual.Count > 1 && dados[jogadaAtual[0].x][jogadaAtual[0].y] == atual)
         {
-            g.FillRectangle(corJogada,
-                tamX + jogada.x * tamanhoCelula,
-                tamY + jogada.y * tamanhoCelula,
-                tamanhoCelula, tamanhoCelula
-            );
+            foreach (var jogada in jogadaAtual)
+            {
+                g.FillRectangle(corJogada,
+                    tamX + jogada.x * tamanhoCelula,
+                    tamY + jogada.y * tamanhoCelula,
+                    tamanhoCelula, tamanhoCelula
+                );
+            }
+            foreach (var segmento in linhaTracada)
+            {
+                g.DrawLine(Pens.DimGray, tamX + segmento.incial.X * tamanhoCelula + tamanhoCelula / 2,
+                tamY + segmento.incial.Y * tamanhoCelula + tamanhoCelula / 2,
+                tamX + segmento.final.X * tamanhoCelula + tamanhoCelula / 2,
+                tamY + segmento.final.Y * tamanhoCelula + tamanhoCelula / 2);
+            }
+        }
+        else
+        {
+            if (linhaTracada.Count > 0)
+                linhaTracada.RemoveAt(linhaTracada.Count - 1);
         }
     }
 
-    public bool VerificarMovimento(int x, int y) // se o movimento de uma bola para outra é válido 
-    {
-        if (jogadaAtual.Count == 0)
-            return true;
 
-        var (ultimoX, ultimoY) = jogadaAtual.Last();
-        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1 && SemCruzamentos(x, y);
-    }
-
-    private bool Cruzam((Point start, Point end) segmento1, (Point start, Point end) segmento2)
-    {
-        return true;
-    }
-
+    /// <summary>
+    /// verifica se ele encaixou o atual com o final
+    /// </summary>
+    private bool PontoFinalValido(int x, int y)
+        => atual != null && jogadas[x][y] == atual;
 
     private void carregar(int tamanho, int qtdBolas)
     {
@@ -220,6 +268,9 @@ public class Jogo
 
     }
 
+    /// <summary>
+    /// alet aleatorio
+    /// </summary>
     private (int x, int y) pegarEspacoVazio(int tamanho, Random alet)
     {
         int x = alet.Next(tamanho);
