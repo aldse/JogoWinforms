@@ -13,12 +13,22 @@ public class Jogo
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
     List<Point> pontosLinha = new List<Point>();
     List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
-    public void Carregar() //mudar o tamanho e a quantidade para random
+
+    /// <summary>
+    /// mudar o tamanho e a quantidade para random
+    /// </summary>
+    public void Carregar()
     {
         carregar(15, 10);
     }
 
-    public void Jogar(int x, int y, PictureBox pb)  //Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
+    /// <summary>
+    /// Coisas que deve ter: vai de um ao outro / não deixa passar aonde ja passou ou aode esta ocupado / cores iguais se encaixam
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="pb"></param>
+    public void Jogar(int x, int y, PictureBox pb)
     {
         int TamanhoDoQuadrado = Math.Min(pb.Width, pb.Height) - 300;
 
@@ -55,23 +65,59 @@ public class Jogo
         }
     }
     public void ValidarJogada() //chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
-    {   
+    {
         atual = null;
-        
-        
 
-        
+        var (ultimoX, ultimoY) = jogadaAtual.Last();
+        if (temBolinhaPerto(ultimoX, ultimoY))
+        {
+            MessageBox.Show("Opa");
+            //ele tem que ver se ele encaixou uma na outra sem cruzar ninguem 
+            LimparJogada();
+        }
+    
         LimparJogadaAtual();
+    }
+
+    private void LimparJogada() //pega a ultima jogada de jogadas e apaga
+    {
+        // var jogadas = jogadaAtual.Last.Clear(); //a ultima jogada
+
+        // jogadaAtual.Clear();
+        if (jogadaAtual != null)
+        {
+            jogadaAtual.RemoveAt(jogadaAtual.Count - 1);
+            pontosLinha.Clear();
+        }
+
     }
 
     /// <summary>
     /// Procura se existe uma bolinha em volta de uma posição (x, y) e retorna
-    /// verdadeiro se a jogada na posição (x, y) possui a mesma cor que a da bolinha.
+    /// verdadeiro se a jogada na posição (x, y) possui a mesma cor que a da bolinha., ver caminho
     /// </summary>
     private bool temBolinhaPerto(int x, int y)
     {
         var cor = jogadas[x][y];
+        var tamanho = jogadas.Length;
 
+        for (int i = x - 1; i < x + 2; i++)
+        {
+            if (i < 0 || i >= tamanho)
+                continue;
+
+            for (int j = y - 1; j < y + 2; j++)
+            {
+                if (j < 0 || j >= jogadas[i].Length)
+                    continue;
+
+                if (x == i && y == j)
+                    continue;
+
+                if (dados[i][j] == cor)
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -82,7 +128,7 @@ public class Jogo
             var (ultimoX, ultimoY) = jogadaAtual.Last();
             if (!PontoFinalValido(ultimoX, ultimoY))
             {
-                linhaTracada.RemoveAt(linhaTracada.Count - 1);  
+                linhaTracada.RemoveAt(linhaTracada.Count - 1);
             }
         }
     }
@@ -136,7 +182,7 @@ public class Jogo
 
         if (delta == 0)
         {
-            return false; 
+            return false;
         }
 
         float intersectX = (b2 * c1 - b1 * c2) / delta;
@@ -221,18 +267,6 @@ public class Jogo
                     tamanhoCelula, tamanhoCelula
                 );
             }
-            foreach (var segmento in linhaTracada)
-            {
-                g.DrawLine(Pens.DimGray, tamX + segmento.incial.X * tamanhoCelula + tamanhoCelula / 2,
-                tamY + segmento.incial.Y * tamanhoCelula + tamanhoCelula / 2,
-                tamX + segmento.final.X * tamanhoCelula + tamanhoCelula / 2,
-                tamY + segmento.final.Y * tamanhoCelula + tamanhoCelula / 2);
-            }
-        }
-        else
-        {
-            if (linhaTracada.Count > 0)
-                linhaTracada.RemoveAt(linhaTracada.Count - 1);
         }
     }
 
