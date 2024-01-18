@@ -51,7 +51,7 @@ public class Jogo
         }
         else
         {
-            if (jogadas[x][y] == null && dados[x][y] == null && VerificarMovimento(x, y) && !CruzamComLinhaTraçada(x, y))
+            if (jogadas[x][y] == null && dados[x][y] == null)
             {
                 if (jogadaAtual.Count > 1)
                 {
@@ -67,30 +67,40 @@ public class Jogo
     public void ValidarJogada() //chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
     {
         atual = null;
+        if (jogadaAtual.Count == 0)
+            return;
 
         var (ultimoX, ultimoY) = jogadaAtual.Last();
         if (temBolinhaPerto(ultimoX, ultimoY))
         {
             MessageBox.Show("Opa");
             //ele tem que ver se ele encaixou uma na outra sem cruzar ninguem 
+        }
+        else
+        {
+
             LimparJogada();
         }
-    
+
         LimparJogadaAtual();
     }
 
-    private void LimparJogada() //pega a ultima jogada de jogadas e apaga
+    private void LimparJogada()
     {
-        // var jogadas = jogadaAtual.Last.Clear(); //a ultima jogada
-
-        // jogadaAtual.Clear();
-        if (jogadaAtual != null)
+        foreach (var jogadaAtualCoordenadas in jogadaAtual)
         {
-            jogadaAtual.RemoveAt(jogadaAtual.Count - 1);
-            pontosLinha.Clear();
-        }
+            int x = jogadaAtualCoordenadas.x;
+            int y = jogadaAtualCoordenadas.y;
 
+            if (jogadas[x][y] != null)
+            {
+                jogadas[x][y] = null;
+            }
+        }
     }
+
+
+
 
     /// <summary>
     /// Procura se existe uma bolinha em volta de uma posição (x, y) e retorna
