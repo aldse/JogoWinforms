@@ -7,14 +7,13 @@ class Program
     [STAThread]
     static void Main()
     {
+        Tela atual = null;
         ApplicationConfiguration.Initialize();
 
-        Jogo jogo = new Jogo();
         Bitmap bmp = null;
         Graphics g = null;
 
         Point clicado = Point.Empty; //empty = vazio
-        bool isMouseClicado = new Boolean();
 
         Timer timer = new Timer()
         {
@@ -35,47 +34,42 @@ class Program
 
         timer.Tick += delegate
         {
-            g.Clear(Color.Black);
-            // g.DrawString("Jogo Winforms", form.Font, Brushes.WhiteSmoke, Point.Empty);
-            jogo.Desenhar(pb, g);
-            pb.Refresh();
+            atual.OnTick();
         };
 
         pb.MouseDown += (o, e) =>
         {
-            clicado = e.Location;
-            isMouseClicado = true;
-            jogo.Jogar((int)e.X, (int)e.Y, pb);
+            atual.OnMouseDown(e);
         };
 
         pb.MouseUp += (o, e) =>
         {
-            clicado = Point.Empty;
-            isMouseClicado = false;
-            jogo.ValidarJogada();
+            atual.OnMouseUp(e);
         };
 
         pb.MouseMove += (o, e) =>
         {
-            if (isMouseClicado)
-                jogo.Jogar((int)e.X, (int)e.Y, pb);
+            atual.OnMouseMove(e);
         };
 
         form.KeyDown += (o, e) =>
         {
-            if (e.KeyCode == Keys.Escape)
-                Application.Exit();
-
-            if (e.KeyCode == Keys.Space)
-                jogo.Carregar();
+            atual.OnKeyDown(e);
         };
 
         form.Load += (o, e) =>
         {
+            atual = new Menu
+            {
+                MainForm = form,
+                Graphics = g,
+                PictureBox = pb
+            };
+
             bmp = new Bitmap(pb.Width, pb.Height);
             g = Graphics.FromImage(bmp);
 
-            jogo.Carregar();
+            atual.Carregar();
 
             pb.Image = bmp;
             timer.Start();

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 
 namespace JogoWinforms;
-public class Jogo
+public class Jogo : Tela
 {   //? indica que o tipo é anulável 
     Color?[][] dados;
     Color?[][] jogadas;
@@ -14,10 +14,46 @@ public class Jogo
     List<Point> pontosLinha = new List<Point>();
     List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
 
+    public override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Escape)
+            Application.Exit();
+
+        if (e.KeyCode == Keys.Space)
+            Carregar();
+    }
+
+    bool isMouseClicado = false;
+    public override void OnMouseMove(MouseEventArgs e)
+    {
+        if (isMouseClicado)
+            this.Jogar((int)e.X, (int)e.Y, PictureBox);
+    }
+
+    public override void OnTick()
+    {
+        Graphics.Clear(Color.Black);
+        this.Desenhar(PictureBox, Graphics);
+        PictureBox.Refresh();
+    }
+    Point clicado = Point.Empty; //empty = vazio
+    public override void OnMouseDown(MouseEventArgs e)
+    {
+        clicado = e.Location;
+        isMouseClicado = true;
+        this.Jogar((int)e.X, (int)e.Y, PictureBox);
+    }
+
+    public override void OnMouseUp(MouseEventArgs e)
+    {
+        clicado = Point.Empty;
+        isMouseClicado = false;
+        this.ValidarJogada();
+    }
     /// <summary>
     /// mudar o tamanho e a quantidade para random
     /// </summary>
-    public void Carregar()
+    public override void Carregar()
     {
         carregar(15, 10);
     }
@@ -98,10 +134,6 @@ public class Jogo
             }
         }
     }
-
-
-
-
     /// <summary>
     /// Procura se existe uma bolinha em volta de uma posição (x, y) e retorna
     /// verdadeiro se a jogada na posição (x, y) possui a mesma cor que a da bolinha., ver caminho
