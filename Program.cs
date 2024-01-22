@@ -4,10 +4,13 @@ using System.Windows.Forms;
 using JogoWinforms;
 class Program
 {
+    static Tela atual = null;
+    public static void AtualizarTela(Tela tela)
+        => atual = tela;
+
     [STAThread]
     static void Main()
     {
-        Tela atual = null;
         ApplicationConfiguration.Initialize();
 
         Bitmap bmp = null;
@@ -59,15 +62,15 @@ class Program
 
         form.Load += (o, e) =>
         {
+            bmp = new Bitmap(pb.Width, pb.Height);
+            g = Graphics.FromImage(bmp);
+
             atual = new Menu
             {
                 MainForm = form,
                 Graphics = g,
                 PictureBox = pb
             };
-
-            bmp = new Bitmap(pb.Width, pb.Height);
-            g = Graphics.FromImage(bmp);
 
             atual.Carregar();
 

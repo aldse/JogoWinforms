@@ -48,8 +48,15 @@ public class Menu : Tela
 
         ngBtn.Click += delegate
         {
-            MainForm.Hide();
-            // Abrir tela de novo jogo
+            Tela tela = new Jogo
+            {
+                PictureBox = this.PictureBox,
+                MainForm = this.MainForm,
+                Graphics = this.Graphics
+            };
+            tela.Carregar();
+            Program.AtualizarTela(tela);
+            PictureBox.Controls.Clear();
         };
 
         Button cntBtn = new Button();
@@ -86,8 +93,7 @@ public class Menu : Tela
 
         cntBtn.Click += delegate
         {
-            MainForm.Hide();
-            // Abrir save do usuário
+            Application.Exit();
         };
 
         PictureBox.BackColor = Color.Black;

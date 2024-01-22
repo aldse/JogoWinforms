@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace JogoWinforms;
 public class Jogo : Tela
 {   //? indica que o tipo é anulável 
-    Color?[][] dados;
+    Color?[][] bolas;
     Color?[][] jogadas;
     Color? atual = null;
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
@@ -55,7 +55,7 @@ public class Jogo : Tela
     /// </summary>
     public override void Carregar()
     {
-        carregar(15, 10);
+        carregar(15, 20);
     }
 
     /// <summary>
@@ -79,15 +79,15 @@ public class Jogo : Tela
 
         if (atual == null)
         {
-            if (jogadas[x][y] != null)
+            if (bolas[x][y] != null)
             {
-                atual = jogadas[x][y];
+                atual = bolas[x][y];
                 jogadaAtual.Add((x, y));
             }
         }
         else
         {
-            if (jogadas[x][y] == null && dados[x][y] == null)
+            if (jogadas[x][y] == null && bolas[x][y] == null)
             {
                 if (jogadaAtual.Count > 1)
                 {
@@ -105,16 +105,26 @@ public class Jogo : Tela
         atual = null;
         if (jogadaAtual.Count == 0)
             return;
-
         var (ultimoX, ultimoY) = jogadaAtual.Last();
-        if (temBolinhaPerto(ultimoX, ultimoY))
+        var (primeiroX, primeiroY) = jogadaAtual.First();
+
+         var cor = jogadas[primeiroX][primeiroY];
+
+        if (primeiroX != ultimoX && primeiroY != ultimoY || bolas[primeiroX][primeiroY] == cor)
         {
-            MessageBox.Show("Opa");
-            //ele tem que ver se ele encaixou uma na outra sem cruzar ninguem 
+
+            if (temBolinhaPerto(ultimoX, ultimoY))
+            {
+                MessageBox.Show("Opa");
+                //ele tem que ver se ele encaixou uma na outra sem cruzar ninguem 
+            }
+            else
+            {
+                LimparJogada();
+            }
         }
         else
         {
-
             LimparJogada();
         }
 
@@ -156,7 +166,7 @@ public class Jogo : Tela
                 if (x == i && y == j)
                     continue;
 
-                if (dados[i][j] == cor)
+                if (bolas[i][j] == cor)
                     return true;
             }
         }
@@ -181,17 +191,6 @@ public class Jogo : Tela
 
         var (ultimoX, ultimoY) = jogadaAtual.Last();
         return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1 && SemCruzamentos(x, y);
-    }
-    private bool CruzamComLinhaTraçada(int x, int y)
-    {
-        foreach (var tracoExistente in linhaTracada)
-        {
-            if (Cruzam((tracoExistente.incial, tracoExistente.final), (new Point(jogadaAtual.Last().x, jogadaAtual.Last().y), new Point(x, y))))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public bool SemCruzamentos(int x, int y)
@@ -269,9 +268,9 @@ public class Jogo : Tela
 
                 g.DrawRectangle(Pens.DimGray, x, y, tamanhoCelula, tamanhoCelula);
 
-                if (dados[i][j] is not null)
+                if (bolas[i][j] is not null)
                 {
-                    var cor = dados[i][j].Value;
+                    var cor = bolas[i][j].Value;
 
                     g.FillEllipse(new SolidBrush(cor),
                         tamanhoCelula * i + tamX + 10,
@@ -299,7 +298,7 @@ public class Jogo : Tela
 
         var corJogada = new SolidBrush(atual.Value);
 
-        if (jogadaAtual.Count > 1 && dados[jogadaAtual[0].x][jogadaAtual[0].y] == atual)
+        if (jogadaAtual.Count > 1 && bolas[jogadaAtual[0].x][jogadaAtual[0].y] == atual)
         {
             foreach (var jogada in jogadaAtual)
             {
@@ -321,7 +320,7 @@ public class Jogo : Tela
 
     private void carregar(int tamanho, int qtdBolas)
     {
-        dados = Enumerable.Range(0, tamanho)
+        bolas = Enumerable.Range(0, tamanho)
             .Select(x => new Color?[tamanho])
             .ToArray();
         jogadas = Enumerable.Range(0, tamanho)
@@ -334,12 +333,10 @@ public class Jogo : Tela
             var color = pegarCor(alet);
 
             (int x, int y) = pegarEspacoVazio(tamanho, alet);
-            jogadas[x][y] = color;
-            dados[x][y] = color;
+            bolas[x][y] = color;
 
             (x, y) = pegarEspacoVazio(tamanho, alet);
-            jogadas[x][y] = color;
-            dados[x][y] = color;
+            bolas[x][y] = color;
         }
 
     }
@@ -351,7 +348,7 @@ public class Jogo : Tela
     {
         int x = alet.Next(tamanho);
         int y = alet.Next(tamanho);
-        while (dados[x][y] != null)
+        while (bolas[x][y] != null)
         {
             x = alet.Next(tamanho);
             y = alet.Next(tamanho);
