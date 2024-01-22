@@ -9,6 +9,8 @@ public class Menu : Tela
 {
     public override void Carregar()
     {
+        Pontuacao pontuacao = new Pontuacao();
+
         Image botao = Image.FromFile("img/bntj.png");
 
         MainForm.WindowState = FormWindowState.Maximized;
@@ -80,6 +82,14 @@ public class Menu : Tela
         path1.AddArc(cntBtn.Width - 2 * radius1, cntBtn.Height - 2 * radius1, radius1 * 2, radius1 * 2, 0, 90);
         path1.AddArc(0, cntBtn.Height - 2 * radius1, radius1 * 2, radius1 * 2, 90, 90);
         cntBtn.Region = new Region(path1);
+
+        Label melhorPontuacaoLabel = new Label();
+        melhorPontuacaoLabel.ForeColor = Color.White;
+        melhorPontuacaoLabel.Font = new Font("Comic Sans MS", 20);
+        melhorPontuacaoLabel.Text = "Melhor Pontuação: " + pontuacao.ObterMaiorPontuacao();
+        melhorPontuacaoLabel.AutoSize = true;
+        melhorPontuacaoLabel.Location = new Point(1600, 600);
+        PictureBox.Controls.Add(melhorPontuacaoLabel);
 
         cntBtn.MouseEnter += (sender, e) =>
         {
