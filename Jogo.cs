@@ -6,15 +6,16 @@ using System.Collections.Generic;
 
 namespace JogoWinforms;
 public class Jogo : Tela
-{   //? indica que o tipo é anulável 
+{
     Color?[][] bolas;
     Color?[][] jogadas;
     Color? atual = null;
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
     List<Point> pontosLinha = new List<Point>();
     List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
-    // List<(int pontos)> pontuacao = new List<(int pontos)>();
     Pontuacao pontuacao = new Pontuacao();
+    List<Boolean> bola = new List<Boolean>();
+    public bool bolinhas = false;
     public override void OnKeyDown(KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
@@ -93,57 +94,43 @@ public class Jogo : Tela
         }
         else
         {
-            if (jogadas[x][y] == null && bolas[x][y] == null)
+            if (jogadas[x][y] == null)
             {
-                if (jogadaAtual.Count > 1)
-                {
-                    pontosLinha.AddRange(jogadaAtual.Select(p => new Point(p.x, p.y)));
-                    linhaTracada.Add((pontosLinha.First(), pontosLinha.Last()));
-                }
-
                 jogadas[x][y] = atual;
                 jogadaAtual.Add((x, y));
             }
-        }
 
-        if (x < 0 || x >= num || y < 0 || y >= num)
-        {
-            Console.WriteLine($"Erro: Índices x ou y inválidos - x: {x}, y: {y}");
-        }
-        else if (bolas[x] == null || bolas[x].Length <= y)
-        {
-            Console.WriteLine("Erro: Matriz bolas não foi inicializada corretamente.");
-        }
-        else if (bolas[x][y] != null)
-        {
-            Console.WriteLine($"Erro: Posição ({x}, {y}) já ocupada por uma bola.");
+            if (jogadas[x][y] != atual)
+            {
+                atual = null;
+                LimparJogada();
+                LimparJogadaAtual();
+                return;
+            }
+
+            if (bolas[x][y] != atual && bolas[x][y] != null)
+            {
+                atual = null;
+                LimparJogada();
+                LimparJogadaAtual();
+                return;
+            }
         }
     }
     public void ValidarJogada() //chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
     {
-        var add = 0;
         atual = null;
         if (jogadaAtual.Count == 0)
             return;
+            
         var (ultimoX, ultimoY) = jogadaAtual.Last();
         var (primeiroX, primeiroY) = jogadaAtual.First();
 
         var cor = jogadas[primeiroX][primeiroY];
 
-        if (primeiroX != ultimoX && primeiroY != ultimoY || bolas[primeiroX][primeiroY] == cor)
+        if (primeiroX != ultimoX && primeiroY != ultimoY && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
         {
-
-            if (temBolinhaPerto(ultimoX, ultimoY))
-            {
-                add = pontuacao.ObterPontoAtual() + 10;
-                pontuacao.Atualizar(add);
-
-                //ele tem que ver se ele encaixou uma na outra sem cruzar ninguem 
-            }
-            else
-            {
-                LimparJogada();
-            }
+            pontuacao.Pontos += 10;
         }
         else
         {
@@ -269,7 +256,7 @@ public class Jogo : Tela
 
     public void DesenharPontuacao(Graphics g)
     {
-        string textoPontuacao = "Pontuação: " + pontuacao.ObterPontoAtual(); // Substitua ObterPontos() pelo método real que obtém a pontuação atual
+        string textoPontuacao = "Pontuação: " + pontuacao.Pontos; // Substitua ObterPontos() pelo método real que obtém a pontuação atual
 
         Font fonte = new Font("Arial", 12);
         SolidBrush brush = new SolidBrush(Color.White);
