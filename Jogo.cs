@@ -7,15 +7,18 @@ using System.Collections.Generic;
 namespace JogoWinforms;
 public class Jogo : Tela
 {
+    Button uppop;
     Color?[][] bolas;
     Color?[][] jogadas;
     Color? atual = null;
     List<(int x, int y)> jogadaAtual = new List<(int x, int y)>();
-    List<Point> pontosLinha = new List<Point>();
     List<(Point incial, Point final)> linhaTracada = new List<(Point inicial, Point final)>();
     Pontuacao pontuacao = new Pontuacao();
-    List<Boolean> bola = new List<Boolean>();
-    public bool bolinhas = false;
+    Tempo tempo = new Tempo();
+    FormularioJogo popUp = new FormularioJogo();
+    List<(int x, int y)> bolasMarcadas = new List<(int x, int y)>();
+
+
     public override void OnKeyDown(KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
@@ -84,9 +87,14 @@ public class Jogo : Tela
         x = (x - tamX) / tamanhoCelula;
         y = (y - tamY) / tamanhoCelula;
 
+        if (x < 0 || x >= bolas.Length || y < 0 || y >= bolas[x].Length)
+        {
+            return;
+        }
+
         if (atual == null)
         {
-            if (bolas[x][y] != null)
+            if (bolas[x][y] != null && !bolasMarcadas.Contains((x, y)))
             {
                 atual = bolas[x][y];
                 jogadaAtual.Add((x, y));
@@ -115,14 +123,19 @@ public class Jogo : Tela
                 LimparJogadaAtual();
                 return;
             }
+
         }
+
     }
-    public void ValidarJogada() //chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
+    /// <summary>
+    /// chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
+    /// </summary>
+    public void ValidarJogada()
     {
         atual = null;
         if (jogadaAtual.Count == 0)
             return;
-            
+
         var (ultimoX, ultimoY) = jogadaAtual.Last();
         var (primeiroX, primeiroY) = jogadaAtual.First();
 
@@ -131,6 +144,12 @@ public class Jogo : Tela
         if (primeiroX != ultimoX && primeiroY != ultimoY && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
         {
             pontuacao.Pontos += 10;
+
+            foreach (var posicao in jogadaAtual)
+            {
+                bolasMarcadas.Add(posicao);
+
+            }
         }
         else
         {
@@ -181,8 +200,12 @@ public class Jogo : Tela
         }
         return false;
     }
-
-    public void ValidarPontoFinal(int x, int y) // ideia era remove a última linha traçada se o ponto final não for válido, chama no validaJogada
+    /// <summary>
+    /// ideia era remove a última linha traçada se o ponto final não for válido, chama no validaJogada
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public void ValidarPontoFinal(int x, int y)
     {
         if (jogadaAtual.Count > 1)
         {
@@ -193,7 +216,14 @@ public class Jogo : Tela
             }
         }
     }
-    public bool VerificarMovimento(int x, int y) // se o movimento de uma bola para outra é válido 
+
+    /// <summary>
+    /// se o movimento de uma bola para outra é válido 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public bool VerificarMovimento(int x, int y)
     {
         if (jogadaAtual.Count == 0)
             return true;
@@ -256,7 +286,7 @@ public class Jogo : Tela
 
     public void DesenharPontuacao(Graphics g)
     {
-        string textoPontuacao = "Pontuação: " + pontuacao.Pontos; // Substitua ObterPontos() pelo método real que obtém a pontuação atual
+        string textoPontuacao = "Pontuação: " + pontuacao.Pontos;
 
         Font fonte = new Font("Arial", 12);
         SolidBrush brush = new SolidBrush(Color.White);
@@ -278,6 +308,7 @@ public class Jogo : Tela
         // Quadrado 
         g.DrawRectangle(Pens.Black, tamX, tamY, TamanhoDoQuadrado, TamanhoDoQuadrado);
 
+        DesenharBotao();
         int num = 15;
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
@@ -317,6 +348,8 @@ public class Jogo : Tela
             DesenharPontuacao(g);
         }
 
+
+
         if (!atual.HasValue) //retorna um valor atual
             return;
 
@@ -335,6 +368,34 @@ public class Jogo : Tela
         }
     }
 
+    public void DesenharBotao()
+    {
+        uppop = new Button();
+        uppop.FlatStyle = FlatStyle.Flat;
+        uppop.FlatAppearance.BorderSize = 0;
+        uppop.FlatAppearance.MouseDownBackColor = Color.Transparent;
+        uppop.FlatAppearance.MouseOverBackColor = Color.Transparent;
+        uppop.BackColor = Color.Black; // Define a cor de fundo inicial do botão
+        uppop.ForeColor = Color.White;
+        uppop.Font = new Font("Arial", 12);
+        uppop.Text = "Menu";
+        uppop.Size = new Size(200, 30);
+        uppop.Width = 230;
+        uppop.Height = 85;
+        uppop.Location = new Point(PictureBox.Width - 180, PictureBox.Height - 80);
+
+        uppop.Click += delegate
+        {
+            popUp.Close();
+        };
+
+        uppop.MouseHover += (sender, e) =>
+        {
+            popUp.ShowDialog();
+        };
+
+        PictureBox.Controls.Add(uppop);
+    }
 
     /// <summary>
     /// verifica se ele encaixou o atual com o final
