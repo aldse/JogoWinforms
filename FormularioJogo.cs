@@ -28,29 +28,23 @@ namespace JogoWinforms
 
             Controls.Add(acima);
 
-            Card("Card 1");
-            Card("Card 3");
-            Card("Card 5");
-            Card("Card 7");
-            Card("Card 11");
-            Card("Card 20");
-            Card("Card 24");
-            Card("Card 28");
-            Card("Card 31");
-            Card("Card 35");
-            Card("Card 39");
-            Card("Card 47");
+            // Adiciona 10 cartões superiores
+            for (int i = 1; i <= 10; i++)
+            {
+                Card($"Card {i}");
+            }
 
             debaixo = new FlowLayoutPanel();
             debaixo.Dock = DockStyle.Bottom;
-            debaixo.Height = 120; 
+            debaixo.Height = 120;
 
             Controls.Add(debaixo);
 
-            CardInferior("1");
-            CardInferior("2");
-            CardInferior("3");
-            CardInferior("4");
+            // Adiciona 4 cartões inferiores
+            for (int i = 1; i <= 4; i++)
+            {
+                CardInferior(i.ToString());
+            }
 
             Botao();
         }
@@ -58,7 +52,8 @@ namespace JogoWinforms
         private void Card(string texto)
         {
             var card = new UserControl();
-            card.Size = new System.Drawing.Size(150, 100);
+            card.Size = new System.Drawing.Size(180, 120); // Ajusta o tamanho
+            card.Margin = new Padding(5); // Adiciona uma margem
             card.BorderStyle = BorderStyle.FixedSingle;
 
             var label = new Label();
@@ -67,7 +62,6 @@ namespace JogoWinforms
 
             acima.Controls.Add(card);
         }
-
         private void CardInferior(string texto)
         {
             var card = new UserControl();
@@ -89,7 +83,7 @@ namespace JogoWinforms
             sair.FlatAppearance.BorderSize = 0;
             sair.FlatAppearance.MouseDownBackColor = Color.Transparent;
             sair.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            sair.BackColor = Color.Black; 
+            sair.BackColor = Color.Black;
             sair.ForeColor = Color.Red;
             sair.Font = new Font("Arial", 12);
             sair.Text = "Menu";
