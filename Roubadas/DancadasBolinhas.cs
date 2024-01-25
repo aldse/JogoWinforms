@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public DancadasBolinhas()
         {
-            this.QunatidadeJogadas = 31;
+            this.QuantidadeJogadas = 31;
+        }
+
+        public override void MudarBolinha()
+        {
+        
         }
     }
 }

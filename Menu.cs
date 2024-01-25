@@ -11,7 +11,8 @@ public class Menu : Tela
     {
         Pontuacao pontuacao = new Pontuacao();
 
-        Image botao = Image.FromFile("img/bntj.png");
+        Image background = Image.FromFile("img/back.png");
+        Image jogar = Image.FromFile("img/retanjogar.png");
 
         MainForm.WindowState = FormWindowState.Maximized;
         MainForm.FormBorderStyle = FormBorderStyle.None;
@@ -22,17 +23,20 @@ public class Menu : Tela
         ngBtn.FlatAppearance.BorderSize = 0;
         ngBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
         ngBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        ngBtn.BackColor = Color.Black; // Define a cor de fundo inicial do botão
-        ngBtn.ForeColor = Color.White; // Define a cor de texto inicial do botão
-        ngBtn.Text = "Jogar";
+        ngBtn.BackgroundImage = jogar; // Remova esta linha
+        ngBtn.BackgroundImageLayout = ImageLayout.Stretch;
         ngBtn.Font = new Font("Comic Sans MS", 30);
-        ngBtn.Width = 230;
-        ngBtn.Height = 85;
-        ngBtn.Location = new Point(1600, 740);
+        ngBtn.Width = 330;
+        ngBtn.Height = 200;
+        ngBtn.Location = new Point(550, 250);
+
+        // Defina o fundo do botão como transparente
+        ngBtn.BackColor = Color.Transparent;
+
 
         // Arredondar os cantos do botão
         GraphicsPath path = new GraphicsPath();
-        int radius = 10; // Ajuste o raio para arredondar mais ou menos
+        int radius = 10; 
         path.AddArc(0, 0, radius * 2, radius * 2, 180, 90);
         path.AddArc(ngBtn.Width - 2 * radius, 0, radius * 2, radius * 2, 270, 90);
         path.AddArc(ngBtn.Width - 2 * radius, ngBtn.Height - 2 * radius, radius * 2, radius * 2, 0, 90);
@@ -40,12 +44,12 @@ public class Menu : Tela
         ngBtn.Region = new Region(path);
         ngBtn.MouseEnter += (sender, e) =>
         {
-            ngBtn.ForeColor = Color.Black; // Muda a cor do texto quando o mouse entra no botão
+            ngBtn.ForeColor = Color.Black;
         };
 
         ngBtn.MouseLeave += (sender, e) =>
         {
-            ngBtn.ForeColor = Color.White; // Restaura a cor original do texto quando o mouse sai do botão
+            ngBtn.ForeColor = Color.White; 
         };
 
         ngBtn.Click += delegate
@@ -106,8 +110,9 @@ public class Menu : Tela
             Application.Exit();
         };
 
-        PictureBox.BackColor = Color.Black;
+        PictureBox.BackgroundImageLayout = ImageLayout.Stretch;
 
+        PictureBox.BackgroundImage = background;
         PictureBox.Controls.Add(ngBtn);
         PictureBox.Controls.Add(cntBtn);
     }

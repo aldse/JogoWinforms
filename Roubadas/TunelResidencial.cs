@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
            public TunelResidencial()
         {
-            this.QunatidadeJogadas = 20;
+            this.QuantidadeJogadas = 20;
+        }
+
+        public override void Tunel()
+        {
+
         }
     }
 }

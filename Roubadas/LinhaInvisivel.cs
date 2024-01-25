@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public LinhaInvisivel()
         {
-            this.QunatidadeJogadas = 47;
+            this.QuantidadeJogadas = 47;
+        }
+
+        public override void pularLinha()
+        {
+           
         }
     }
 }

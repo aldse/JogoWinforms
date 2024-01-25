@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using JogoWinforms.Roubadas;
 
 namespace JogoWinforms
 {
@@ -10,6 +12,8 @@ namespace JogoWinforms
         public Graphics Graphics { get; set; }
         private FlowLayoutPanel acima;
         private FlowLayoutPanel debaixo;
+        private List<RoubosJogo> carrinho = new List<RoubosJogo>(); // Lista para armazenar as "roubadas" no carrinho
+        private int JogadasFeitas = 100;
 
         public FormularioJogo()
         {
@@ -31,7 +35,8 @@ namespace JogoWinforms
             // Adiciona 10 cartões superiores
             for (int i = 1; i <= 10; i++)
             {
-                Card($"Card {i}");
+                var roubo = new AniquilacaoTatica();
+                CardRouboJogo(roubo);
             }
 
             debaixo = new FlowLayoutPanel();
@@ -47,7 +52,37 @@ namespace JogoWinforms
             }
 
             Botao();
+
+            debaixo.AllowDrop = true;
+            debaixo.DragEnter += new DragEventHandler(Debaixo_DragEnter);
+            debaixo.DragDrop += new DragEventHandler(Debaixo_DragDrop);
         }
+
+        private void Debaixo_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(RoubosJogo)))
+            {
+                e.Effect = DragDropEffects.Move;
+            }
+        }
+
+        private void Debaixo_DragDrop(object sender, DragEventArgs e)
+        {
+            var pontoDrop = debaixo.PointToClient(new Point(e.X, e.Y));
+            var controleDestino = debaixo.GetChildAtPoint(pontoDrop) as UserControl;
+            if (controleDestino != null)
+            {
+                var rouboJogo = e.Data.GetData(typeof(RoubosJogo)) as RoubosJogo;
+                if (rouboJogo != null && JogadasFeitas >= rouboJogo.QuantidadeJogadas && carrinho.Count < 4)
+                {
+                    carrinho.Add(rouboJogo); 
+                    JogadasFeitas -= rouboJogo.QuantidadeJogadas; 
+                                                                   
+                    controleDestino.Controls.Add(new Label() { Text = rouboJogo.GetType().Name });
+                }
+            }
+        }
+
 
         private void Card(string texto)
         {
@@ -75,6 +110,45 @@ namespace JogoWinforms
             debaixo.Controls.Add(card);
         }
 
+        private void CardRouboJogo(RoubosJogo rouboJogo)
+        {
+            var card = new UserControl();
+            card.Size = new System.Drawing.Size(180, 120);
+            card.Margin = new Padding(5);
+            card.BorderStyle = BorderStyle.FixedSingle;
+            card.Tag = rouboJogo;
+
+            var label = new Label();
+            label.Text = $"{rouboJogo.GetType().Name} - Pontos: {rouboJogo.QuantidadeJogadas}";
+            card.Controls.Add(label);
+
+            card.Click += Card_Click; // Adiciona o evento de clique
+
+            card.MouseDown += (sender, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    card.DoDragDrop(rouboJogo, DragDropEffects.Move);
+                }
+            };
+
+            acima.Controls.Add(card);
+        }
+
+        private void Card_Click(object sender, EventArgs e)
+        {
+            var card = sender as UserControl;
+            if (card != null)
+            {
+                RoubosJogo rouboJogo = card.Tag as RoubosJogo;
+                if (rouboJogo != null && JogadasFeitas >= rouboJogo.QuantidadeJogadas && carrinho.Count < 4)
+                {
+                    carrinho.Add(rouboJogo); // Adiciona ao carrinho
+                    JogadasFeitas -= rouboJogo.QuantidadeJogadas; // Deduz os pontos
+                    CardInferior(rouboJogo.GetType().Name); // Cria um card no painel debaixo para representar a "roubada" no carrinho
+                }
+            }
+        }
 
         public void Botao()
         {

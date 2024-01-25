@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public FugaInstantanea()
         {
-            this.QunatidadeJogadas = 28;
+            this.QuantidadeJogadas = 28;
+        }
+
+        public override void atravessarTela()
+        {
+        
         }
     }
 }

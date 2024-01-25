@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
            public TravessiaDupla()
         {
-            this.QunatidadeJogadas = 3;
+            this.QuantidadeJogadas = 3;
+        }
+
+        public override void pularLinha()
+        {
+       
         }
     }
 }

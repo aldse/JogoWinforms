@@ -4,7 +4,13 @@ namespace JogoWinforms.Roubadas
     {
         public AniquilacaoTatica()
         {
-            this.QunatidadeJogadas = 35;
+            this.QuantidadeJogadas = 35;
+            this.Identificacao = "AniquilacaoTatica";
+        }
+
+        public override void ExcluirBolinha()
+        {
+
         }
     }
 }

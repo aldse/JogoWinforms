@@ -2,9 +2,14 @@ namespace JogoWinforms.Roubadas
 {
     public class RotaLabirintica : RoubosJogo
     {
-           public RotaLabirintica()
+        public RotaLabirintica()
         {
-            this.QunatidadeJogadas = 24;
+            this.QuantidadeJogadas = 24;
+        }
+
+        public override void atravessarTela()
+        {
+            base.atravessarTela();
         }
     }
 }

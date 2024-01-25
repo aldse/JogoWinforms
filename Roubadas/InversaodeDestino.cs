@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public InversaodeDestino()
         {
-            this.QunatidadeJogadas = 11;
+            this.QuantidadeJogadas = 11;
+        }
+
+        public override void MudarTabuleiro()
+        {
+      
         }
     }
 }

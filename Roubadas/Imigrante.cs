@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public Imigrante()
         {
-            this.QunatidadeJogadas = 39;
+            this.QuantidadeJogadas = 39;
+        }
+
+        public override void MudarBolinha()
+        {
+
         }
     }
 }

@@ -4,7 +4,12 @@ namespace JogoWinforms.Roubadas
     {
         public PistaFugaz()
         {
-            this.QunatidadeJogadas = 1;
+            this.QuantidadeJogadas = 1;
+        }
+
+        public override void JogadaPossivel()
+        {
+
         }
     }
 }
