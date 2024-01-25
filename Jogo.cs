@@ -3,6 +3,7 @@ using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace JogoWinforms;
 public class Jogo : Tela
@@ -123,7 +124,29 @@ public class Jogo : Tela
                 LimparJogadaAtual();
                 return;
             }
+        }
+        
+        if (jogadaAtual.Count == 0)
+            return;
+        
+        var agora = jogadaAtual.First();
+        for (int i = 1; i < jogadaAtual.Count; i++)
+        {
+            var proximo = jogadaAtual[i];
+            var dx = agora.x - proximo.x;
+            var dy = agora.y - proximo.y;
+            if (dx < 0) dx = -dx;
+            if (dy < 0) dy = -dy;
 
+            if (dx + dy > 1)
+            {
+                LimparJogada();
+                LimparJogadaAtual();
+                atual = null;
+                return;
+            }
+
+            agora = proximo;
         }
 
     }
@@ -132,7 +155,7 @@ public class Jogo : Tela
     /// </summary>
     public void ValidarJogada()
     {
-        atual = null;
+        this.atual = null;
         if (jogadaAtual.Count == 0)
             return;
 
@@ -348,14 +371,12 @@ public class Jogo : Tela
             DesenharPontuacao(g);
         }
 
-
-
         if (!atual.HasValue) //retorna um valor atual
             return;
 
         var corJogada = new SolidBrush(atual.Value);
 
-        if (jogadaAtual.Count > 1 && bolas[jogadaAtual[0].x][jogadaAtual[0].y] == atual)
+        if (jogadaAtual?.Count > 1 && bolas[jogadaAtual[0].x][jogadaAtual[0].y] == atual)
         {
             foreach (var jogada in jogadaAtual)
             {
@@ -384,14 +405,13 @@ public class Jogo : Tela
         uppop.Height = 85;
         uppop.Location = new Point(PictureBox.Width - 180, PictureBox.Height - 80);
 
-        uppop.Click += delegate
-        {
-            popUp.Close();
-        };
-
         uppop.MouseHover += (sender, e) =>
         {
-            popUp.ShowDialog();
+            var newTela = new MenuDeRoubo(this);
+            newTela.PictureBox = this.PictureBox;
+            newTela.Graphics = this.Graphics;
+            newTela.Carregar();
+            Program.AtualizarTela(newTela);
         };
 
         PictureBox.Controls.Add(uppop);

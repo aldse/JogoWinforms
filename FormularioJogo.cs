@@ -30,9 +30,9 @@ namespace JogoWinforms
             acima.Dock = DockStyle.Fill;
             acima.AutoScroll = true;
 
+
             Controls.Add(acima);
 
-            // Adiciona 10 cartões superiores
             for (int i = 1; i <= 10; i++)
             {
                 var roubo = new AniquilacaoTatica();
@@ -45,57 +45,14 @@ namespace JogoWinforms
 
             Controls.Add(debaixo);
 
-            // Adiciona 4 cartões inferiores
             for (int i = 1; i <= 4; i++)
             {
                 CardInferior(i.ToString());
             }
 
-            Botao();
+            Load += (_, _) => Botao();
 
             debaixo.AllowDrop = true;
-            debaixo.DragEnter += new DragEventHandler(Debaixo_DragEnter);
-            debaixo.DragDrop += new DragEventHandler(Debaixo_DragDrop);
-        }
-
-        private void Debaixo_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(typeof(RoubosJogo)))
-            {
-                e.Effect = DragDropEffects.Move;
-            }
-        }
-
-        private void Debaixo_DragDrop(object sender, DragEventArgs e)
-        {
-            var pontoDrop = debaixo.PointToClient(new Point(e.X, e.Y));
-            var controleDestino = debaixo.GetChildAtPoint(pontoDrop) as UserControl;
-            if (controleDestino != null)
-            {
-                var rouboJogo = e.Data.GetData(typeof(RoubosJogo)) as RoubosJogo;
-                if (rouboJogo != null && JogadasFeitas >= rouboJogo.QuantidadeJogadas && carrinho.Count < 4)
-                {
-                    carrinho.Add(rouboJogo); 
-                    JogadasFeitas -= rouboJogo.QuantidadeJogadas; 
-                                                                   
-                    controleDestino.Controls.Add(new Label() { Text = rouboJogo.GetType().Name });
-                }
-            }
-        }
-
-
-        private void Card(string texto)
-        {
-            var card = new UserControl();
-            card.Size = new System.Drawing.Size(180, 120); // Ajusta o tamanho
-            card.Margin = new Padding(5); // Adiciona uma margem
-            card.BorderStyle = BorderStyle.FixedSingle;
-
-            var label = new Label();
-            label.Text = texto;
-            card.Controls.Add(label);
-
-            acima.Controls.Add(card);
         }
         private void CardInferior(string texto)
         {
@@ -110,7 +67,7 @@ namespace JogoWinforms
             debaixo.Controls.Add(card);
         }
 
-        private void CardRouboJogo(RoubosJogo rouboJogo)
+        private void CardRouboJogo(RoubosJogo rouboJogo) //so 1 ate agr
         {
             var card = new UserControl();
             card.Size = new System.Drawing.Size(180, 120);
@@ -122,7 +79,7 @@ namespace JogoWinforms
             label.Text = $"{rouboJogo.GetType().Name} - Pontos: {rouboJogo.QuantidadeJogadas}";
             card.Controls.Add(label);
 
-            card.Click += Card_Click; // Adiciona o evento de clique
+            card.Click += Card_Click;
 
             card.MouseDown += (sender, e) =>
             {
@@ -135,18 +92,54 @@ namespace JogoWinforms
             acima.Controls.Add(card);
         }
 
-        private void Card_Click(object sender, EventArgs e)
+        private void Card_Click(object card, EventArgs e)
         {
-            var card = sender as UserControl;
+            var carta = card as UserControl;
             if (card != null)
             {
-                RoubosJogo rouboJogo = card.Tag as RoubosJogo;
-                if (rouboJogo != null && JogadasFeitas >= rouboJogo.QuantidadeJogadas && carrinho.Count < 4)
+                RoubosJogo rouboJogo = carta.Tag as RoubosJogo;
+                if (rouboJogo != null)
                 {
-                    carrinho.Add(rouboJogo); // Adiciona ao carrinho
-                    JogadasFeitas -= rouboJogo.QuantidadeJogadas; // Deduz os pontos
-                    CardInferior(rouboJogo.GetType().Name); // Cria um card no painel debaixo para representar a "roubada" no carrinho
+
+                    if (JogadasFeitas >= rouboJogo.QuantidadeJogadas && carrinho.Count < 4)
+                    {
+                        JogadasFeitas -= rouboJogo.QuantidadeJogadas;
+
+                        MoverCardParaBaixo(rouboJogo);
+                    }
+                    else if (carrinho.Count >= 4)
+                    {
+                        MessageBox.Show("Você já tem o número máximo de roubadas para por em jogo!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Você não tem jogadas suficientes!");
+                    }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Por o card de cima para baixo
+        /// </summary>
+        /// <param name="rouboJogo"></param>
+        private void MoverCardParaBaixo(RoubosJogo rouboJogo)
+        {
+            if (debaixo.Controls.Count < 4) // Verifica se há espaço no painel de baixo
+            {
+                UserControl cardInferior = new UserControl();
+                cardInferior.Size = new System.Drawing.Size(150, 100);
+                cardInferior.BorderStyle = BorderStyle.FixedSingle;
+
+                var label = new Label();
+                label.Text = rouboJogo.GetType().Name;
+                cardInferior.Controls.Add(label);
+
+                debaixo.Controls.Add(cardInferior); // Adiciona o novo card ao painel de baixo
+            }
+            else
+            {
+                MessageBox.Show("Você já tem o número máximo de roubadas no carrinho!");
             }
         }
 
@@ -164,14 +157,14 @@ namespace JogoWinforms
             sair.Size = new Size(200, 30);
             sair.Width = 230;
             sair.Height = 85;
-            sair.Location = new Point(PictureBox.Width - 10, PictureBox.Height - 80);
+            sair.Location = new Point(PictureBox.Width - 80, PictureBox.Height - 10);
 
             sair.Click += delegate
             {
                 this.Close();
             };
 
-            Controls.Add(sair);
+            PictureBox.Controls.Add(sair);
         }
 
     }
