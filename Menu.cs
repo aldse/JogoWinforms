@@ -11,8 +11,9 @@ public class Menu : Tela
     {
         Pontuacao pontuacao = new Pontuacao();
 
-        Image background = Image.FromFile("img/back.png");
-        Image jogar = Image.FromFile("img/retanjogar.png");
+        Image background = Image.FromFile("img/bom1.png");
+        Image jogar = Image.FromFile("img/jogar.png");
+        Image sair = Image.FromFile("img/sair.png");
 
         MainForm.WindowState = FormWindowState.Maximized;
         MainForm.FormBorderStyle = FormBorderStyle.None;
@@ -25,18 +26,15 @@ public class Menu : Tela
         ngBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
         ngBtn.BackgroundImage = jogar; // Remova esta linha
         ngBtn.BackgroundImageLayout = ImageLayout.Stretch;
-        ngBtn.Font = new Font("Comic Sans MS", 30);
-        ngBtn.Width = 330;
-        ngBtn.Height = 200;
-        ngBtn.Location = new Point(550, 250);
-
-        // Defina o fundo do botão como transparente
+        ngBtn.Width = 350;
+        ngBtn.Height = 350;
+        ngBtn.Location = new Point(670, 680);
         ngBtn.BackColor = Color.Transparent;
 
 
         // Arredondar os cantos do botão
         GraphicsPath path = new GraphicsPath();
-        int radius = 10; 
+        int radius = 10;
         path.AddArc(0, 0, radius * 2, radius * 2, 180, 90);
         path.AddArc(ngBtn.Width - 2 * radius, 0, radius * 2, radius * 2, 270, 90);
         path.AddArc(ngBtn.Width - 2 * radius, ngBtn.Height - 2 * radius, radius * 2, radius * 2, 0, 90);
@@ -49,7 +47,7 @@ public class Menu : Tela
 
         ngBtn.MouseLeave += (sender, e) =>
         {
-            ngBtn.ForeColor = Color.White; 
+            ngBtn.ForeColor = Color.White;
         };
 
         ngBtn.Click += delegate
@@ -70,13 +68,12 @@ public class Menu : Tela
         cntBtn.FlatAppearance.BorderSize = 0;
         cntBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
         cntBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        cntBtn.BackColor = Color.Black; // Define a cor de fundo inicial do botão
-        cntBtn.ForeColor = Color.White; // Define a cor de texto inicial do botão
-        cntBtn.Text = "Sair";
-        cntBtn.Font = new Font("Comic Sans MS", 30);
-        cntBtn.Width = 230;
-        cntBtn.Height = 85;
-        cntBtn.Location = new Point(1600, 897);
+        cntBtn.BackgroundImage = sair; // Remova esta linha
+        cntBtn.BackgroundImageLayout = ImageLayout.Stretch;
+        cntBtn.Width = 300;
+        cntBtn.Height = 340;
+        cntBtn.Location = new Point(1020, 610);
+        cntBtn.BackColor = Color.Transparent;
 
         // Arredondar os cantos do botão
         GraphicsPath path1 = new GraphicsPath();

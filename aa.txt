@@ -1,0 +1,13 @@
+    public override void OnMouseDown(MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            if (cards[i].Contains(e.Location))
+            {
+                AddCard((int)cards[i].X, (int)cards[i].Y + 220); // Aumentando a posição Y para adicionar a nova carta abaixo da anterior
+
+            }
+        }
+    }
