@@ -1,15 +1,14 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class TravessiaDupla : RoubosJogo
     {
-           public TravessiaDupla()
+        public TravessiaDupla()
         {
             this.QuantidadeJogadas = 3;
-        }
-
-        public override void pularLinha()
-        {
-       
+            this.Identificacao = "Travessia Dupla";
+            this.Foto = Image.FromFile("img/travessiadupla1.png");
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class LinhaInvisivel : RoubosJogo
@@ -5,11 +7,8 @@ namespace JogoWinforms.Roubadas
         public LinhaInvisivel()
         {
             this.QuantidadeJogadas = 47;
-        }
-
-        public override void pularLinha()
-        {
-           
+            this.Identificacao = "Linha Invisível";
+            this.Foto = Image.FromFile("img/bom1.png");
         }
     }
 }

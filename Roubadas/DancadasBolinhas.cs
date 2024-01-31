@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class DancadasBolinhas : RoubosJogo
@@ -5,11 +7,9 @@ namespace JogoWinforms.Roubadas
         public DancadasBolinhas()
         {
             this.QuantidadeJogadas = 31;
-        }
-
-        public override void MudarBolinha()
-        {
-        
+            this.Identificacao = "Dança das Bolinhas";
+            this.Foto = Image.FromFile("img/dancadasbolinhas.png");
         }
     }
 }
+

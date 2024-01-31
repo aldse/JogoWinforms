@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class FugaInstantanea : RoubosJogo
@@ -5,11 +7,8 @@ namespace JogoWinforms.Roubadas
         public FugaInstantanea()
         {
             this.QuantidadeJogadas = 28;
-        }
-
-        public override void atravessarTela()
-        {
-        
+            this.Identificacao = "Fuga Instantanea";
+            this.Foto = Image.FromFile("img/fugainstatanea.png");
         }
     }
 }

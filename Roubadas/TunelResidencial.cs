@@ -1,15 +1,14 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class TunelResidencial : RoubosJogo
     {
-           public TunelResidencial()
+        public TunelResidencial()
         {
             this.QuantidadeJogadas = 20;
-        }
-
-        public override void Tunel()
-        {
-
+            this.Identificacao = "Tunel Residencial";
+            this.Foto = Image.FromFile("img/tunelresidencial.png");
         }
     }
 }

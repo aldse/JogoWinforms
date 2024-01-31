@@ -10,7 +10,7 @@ Túnel Residencial: Criar um túnel, onde a bolinha, ao estar com uma casa na fr
 
 Rota Labiríntica: Atravessar de um lado para outro na mesma linha quando sai da tela, criando uma rota labiríntica.
 
-Fuga Instantânea: Atravessar de um lado para outro quando sai da tela, atravessando uma inha já traçada.
+Fuga Instantânea: Atravessar de um lado para outro quando sai da tela, atravessando uma linha já traçada.
 
 Dança das Bolinhas: Dois pares de bolinhas mudam de lugar.
 

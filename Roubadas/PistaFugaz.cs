@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class PistaFugaz : RoubosJogo
@@ -5,11 +7,8 @@ namespace JogoWinforms.Roubadas
         public PistaFugaz()
         {
             this.QuantidadeJogadas = 1;
-        }
-
-        public override void JogadaPossivel()
-        {
-
+            this.Identificacao = "Pista Fugaz";
+            this.Foto = Image.FromFile("img/pistafugaz2.png");
         }
     }
 }

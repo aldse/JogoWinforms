@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class Imigrante : RoubosJogo
@@ -5,11 +7,8 @@ namespace JogoWinforms.Roubadas
         public Imigrante()
         {
             this.QuantidadeJogadas = 39;
-        }
-
-        public override void MudarBolinha()
-        {
-
+            this.Identificacao = "Imigrante";
+            this.Foto = Image.FromFile("img/bom1.png");
         }
     }
 }

@@ -4,22 +4,23 @@ using System.Linq;
 using System.Windows.Forms;
 using JogoWinforms.Roubadas;
 
+using System;
+using System.Drawing.Drawing2D;
+
 namespace JogoWinforms;
 
 public class MenuDeRoubo : Tela
 {
+    Image background = Image.FromFile("img/talvez.png");
     Jogo fundo = null;
     public MenuDeRoubo(Jogo fundo)
         => this.fundo = fundo;
 
     private int animation = 0;
-    private int espacamentoCards = 20;
-
-    List<RectangleF> cards = new List<RectangleF>();
+    List<RoubosJogo> roubos = new List<RoubosJogo>();
+    RoubosJogo[] vetorRooubos = new RoubosJogo[10];
     int selectedIndex = -1;
-
-    bool isMouseClicado = false;
-    private RectangleF cartaEmMovimento = RectangleF.Empty;
+    private RoubosJogo cartaEmMovimento = null;
     private Point ultimaposicaoMouse = Point.Empty;
     public override void OnTick()
     {
@@ -45,27 +46,51 @@ public class MenuDeRoubo : Tela
         {
             animation++;
 
-            g.FillRectangle(Brushes.SkyBlue,
-                pb.Width - moveX * animation,
-                pb.Height - moveY * animation,
-                (moveX - moveX2) * animation,
-                (moveY - moveY2) * animation
-            );
+            // g.FillRectangle(Brushes.BackgroundImage = background,
+            //     pb.Width - moveX * animation,
+            //     pb.Height - moveY * animation,
+            //     (moveX - moveX2) * animation,
+            //     (moveY - moveY2) * animation
+            // );
+            using (var backgroundImageBrush = new TextureBrush(background))
+            {
+                g.FillRectangle(backgroundImageBrush,
+                    pb.Width - moveX * animation,
+                    pb.Height - moveY * animation,
+                    (moveX - moveX2) * animation,
+                    (moveY - moveY2) * animation
+                );
+            }
+
+
             PictureBox.Refresh();
             return;
         }
 
-        g.FillRectangle(Brushes.SkyBlue,
-            pb.Width - moveX * duration,
-            pb.Height - moveY * duration,
-            (moveX - moveX2) * duration,
-            (moveY - moveY2) * duration
-        );
-
-        foreach (var card in cards)
+        using (var backgroundImageBrush = new TextureBrush(background))
         {
-            g.FillRectangle(Brushes.White, card);
+            g.FillRectangle(backgroundImageBrush,
+                pb.Width - moveX * duration,
+                pb.Height - moveY * duration,
+                (moveX - moveX2) * duration,
+                (moveY - moveY2) * duration
+            );
         }
+
+        // g.FillRectangle(Brushes.Yellow,
+        //     pb.Width - moveX * duration,
+        //     pb.Height - moveY * duration,
+        //     (moveX - moveX2) * duration,
+        //     (moveY - moveY2) * duration
+        // );
+
+        foreach (var roubo in roubos)
+        {
+            roubo.Desenhar(g);
+        }
+
+        if (cartaEmMovimento is not null)
+            cartaEmMovimento.Desenhar(g);
 
         PictureBox.Refresh();
     }
@@ -77,28 +102,39 @@ public class MenuDeRoubo : Tela
 
         int tamanhoXFinal = (int)(pb.Width * propWidth);
         int restoX = pb.Width - tamanhoXFinal;
+        int cardX = restoX / 2 + 37;
+        int cardYTop = 250; // Posição Y da linha superior de cartas
+
+        List<RoubosJogo> tiposDeRoubos = new List<RoubosJogo>
+    {
+        new PistaFugaz(),
+        new TravessiaDupla(),
+        new InversaodeDestino(),
+        new TunelResidencial(),
+        new RotaLabirintica(),
+        new FugaInstantanea(),
+        new DancadasBolinhas(),
+        new AniquilacaoTatica(),
+        new Imigrante(),
+        new LinhaInvisivel()
+    };
 
         for (int i = 0; i < 5; i++)
         {
-            int cardX = restoX / 2 + i * (200 + espacamentoCards) + 37;
-            int cardY = 250;
-            AddCard(cardX, cardY);
+            AddCard(cardX + i * 220, cardYTop, tiposDeRoubos[i]); // Linha superior
+            AddCard(cardX + i * 220, cardYTop + 220, tiposDeRoubos[i + 5]); // Linha inferior
         }
     }
 
-  public override void OnMouseDown(MouseEventArgs e)
+    public override void OnMouseDown(MouseEventArgs e)
     {
-        base.OnMouseDown(e);
-        for (int i = 0; i < cards.Count; i++)
+        for (int i = 0; i < roubos.Count; i++)
         {
-            if (cards[i].Contains(e.Location))
+            if (roubos[i].Rectangle.Contains(e.Location))
             {
-                cartaEmMovimento = cards[i];
+                cartaEmMovimento = roubos[i];
                 ultimaposicaoMouse = e.Location;
                 selectedIndex = i;
-
-                cards.RemoveAt(selectedIndex);
-
                 break;
             }
         }
@@ -106,32 +142,30 @@ public class MenuDeRoubo : Tela
 
     public override void OnMouseUp(MouseEventArgs e)
     {
-        base.OnMouseUp(e);
+        if (cartaEmMovimento is null)
+            return;
 
-        if (!cartaEmMovimento.IsEmpty)
-        {
-            cards.Insert(selectedIndex, cartaEmMovimento);
-            cartaEmMovimento = RectangleF.Empty;
-            ultimaposicaoMouse = Point.Empty;
-        }
+        cartaEmMovimento = null;
+        ultimaposicaoMouse = Point.Empty;
     }
 
     public override void OnMouseMove(MouseEventArgs e)
     {
-        base.OnMouseMove(e);
+        float deltaX = e.Location.X - ultimaposicaoMouse.X;
+        float deltaY = e.Location.Y - ultimaposicaoMouse.Y;
 
-        if (!cartaEmMovimento.IsEmpty)
-        {
-            float deltaX = e.Location.X - ultimaposicaoMouse.X;
-            float deltaY = e.Location.Y - ultimaposicaoMouse.Y;
+        ultimaposicaoMouse = e.Location;
 
-            cartaEmMovimento.X += deltaX;
-            cartaEmMovimento.Y += deltaY;
+        if (cartaEmMovimento is null)
+            return;
 
-            ultimaposicaoMouse = e.Location;
+        cartaEmMovimento.Rectangle = new RectangleF(
+            cartaEmMovimento.Rectangle.X + deltaX,
+            cartaEmMovimento.Rectangle.Y + deltaY,
+            cartaEmMovimento.Rectangle.Width,
+            cartaEmMovimento.Rectangle.Height
+        );
 
-            PictureBox.Invalidate(); 
-        }
     }
     /// <summary>
     ///   cardWidth -> Largura do card 
@@ -139,13 +173,14 @@ public class MenuDeRoubo : Tela
     ///   cardX -> Posição X do card branco
     ///   cardY -> Posição Y do card branco
     /// </summary>
-    private void AddCard(int cardX, int cardY)
+    private void AddCard(int cardX, int cardY, RoubosJogo roubo)
     {
         var g = Graphics;
         var pb = PictureBox;
         int cardWidth = 200;
         int cardHeight = 200;
-        this.cards.Add(new RectangleF(cardX, cardY, cardWidth, cardHeight));
+        roubo.Rectangle = new RectangleF(cardX, cardY, cardWidth, cardHeight);
+        this.roubos.Add(roubo);
     }
 
 }

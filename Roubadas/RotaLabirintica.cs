@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class RotaLabirintica : RoubosJogo
@@ -5,11 +7,8 @@ namespace JogoWinforms.Roubadas
         public RotaLabirintica()
         {
             this.QuantidadeJogadas = 24;
-        }
-
-        public override void atravessarTela()
-        {
-            base.atravessarTela();
+            this.Identificacao = "Rota Labirintica";
+            this.Foto = Image.FromFile("img/rotalabirintica.png");
         }
     }
 }

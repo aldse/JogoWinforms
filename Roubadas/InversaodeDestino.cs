@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class InversaodeDestino : RoubosJogo
@@ -5,11 +7,12 @@ namespace JogoWinforms.Roubadas
         public InversaodeDestino()
         {
             this.QuantidadeJogadas = 11;
-        }
-
-        public override void MudarTabuleiro()
-        {
-      
+            this.Identificacao = "Inversão de Destino";
+            this.Foto = Image.FromFile("img/inversaodedestino.png");
         }
     }
 }
+
+
+
+

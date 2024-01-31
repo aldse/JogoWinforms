@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace JogoWinforms.Roubadas
 {
     public class AniquilacaoTatica : RoubosJogo
@@ -6,11 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 35;
             this.Identificacao = "AniquilacaoTatica";
-        }
-
-        public override void ExcluirBolinha()
-        {
-
+            this.Foto = Image.FromFile("img/aniquilacaotatica.png");
         }
     }
 }
