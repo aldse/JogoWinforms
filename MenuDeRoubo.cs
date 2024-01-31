@@ -13,6 +13,7 @@ public class MenuDeRoubo : Tela
 {
     Image background = Image.FromFile("img/talvez.png");
     Jogo fundo = null;
+    List<PictureBox> rouboCards = new List<PictureBox>();
     public MenuDeRoubo(Jogo fundo)
         => this.fundo = fundo;
 
@@ -45,13 +46,6 @@ public class MenuDeRoubo : Tela
         if (animation < duration)
         {
             animation++;
-
-            // g.FillRectangle(Brushes.BackgroundImage = background,
-            //     pb.Width - moveX * animation,
-            //     pb.Height - moveY * animation,
-            //     (moveX - moveX2) * animation,
-            //     (moveY - moveY2) * animation
-            // );
             using (var backgroundImageBrush = new TextureBrush(background))
             {
                 g.FillRectangle(backgroundImageBrush,
@@ -61,8 +55,6 @@ public class MenuDeRoubo : Tela
                     (moveY - moveY2) * animation
                 );
             }
-
-
             PictureBox.Refresh();
             return;
         }
@@ -76,13 +68,6 @@ public class MenuDeRoubo : Tela
                 (moveY - moveY2) * duration
             );
         }
-
-        // g.FillRectangle(Brushes.Yellow,
-        //     pb.Width - moveX * duration,
-        //     pb.Height - moveY * duration,
-        //     (moveX - moveX2) * duration,
-        //     (moveY - moveY2) * duration
-        // );
 
         foreach (var roubo in roubos)
         {
@@ -103,7 +88,7 @@ public class MenuDeRoubo : Tela
         int tamanhoXFinal = (int)(pb.Width * propWidth);
         int restoX = pb.Width - tamanhoXFinal;
         int cardX = restoX / 2 + 37;
-        int cardYTop = 250; // Posição Y da linha superior de cartas
+        int cardYTop = 250;
 
         List<RoubosJogo> tiposDeRoubos = new List<RoubosJogo>
     {
@@ -123,6 +108,11 @@ public class MenuDeRoubo : Tela
         {
             AddCard(cardX + i * 220, cardYTop, tiposDeRoubos[i]); // Linha superior
             AddCard(cardX + i * 220, cardYTop + 220, tiposDeRoubos[i + 5]); // Linha inferior
+        }
+
+        for (int i = 0; i < 10; i++)
+        {
+            RouboCard(100 + i * 220, 500);
         }
     }
 
@@ -182,5 +172,13 @@ public class MenuDeRoubo : Tela
         roubo.Rectangle = new RectangleF(cardX, cardY, cardWidth, cardHeight);
         this.roubos.Add(roubo);
     }
-
+     private void RouboCard(int cardX, int cardY)
+        {
+            var rouboCard = new PictureBox();
+            rouboCard.BackColor = Color.White;
+            rouboCard.Size = new Size(200, 200);
+            rouboCard.Location = new Point(cardX, cardY);
+            rouboCard.BorderStyle = BorderStyle.FixedSingle;
+            rouboCards.Add(rouboCard);
+        }
 }

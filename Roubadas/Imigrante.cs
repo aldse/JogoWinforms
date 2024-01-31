@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 39;
             this.Identificacao = "Imigrante";
-            this.Foto = Image.FromFile("img/bom1.png");
+            this.Foto = Image.FromFile("img/imigrante.png");
         }
     }
 }

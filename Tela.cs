@@ -8,7 +8,6 @@ namespace JogoWinforms
         public PictureBox PictureBox { get; set; }
         public Graphics Graphics { get; set; }
         public Form MainForm { get; set; }
-
         public virtual void OnMouseMove(MouseEventArgs e) { }
         public virtual void OnMouseDown(MouseEventArgs e) { }
         public virtual void OnMouseUp(MouseEventArgs e) { }
