@@ -4,10 +4,13 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using JogoWinforms.Roubadas;
 
 namespace JogoWinforms;
 public class Jogo : Tela
 {
+
+    MenuDeRoubo roubos = new MenuDeRoubo(null);
     Button uppop;
     Color?[][] bolas;
     Color?[][] jogadas;
@@ -80,10 +83,14 @@ public class Jogo : Tela
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
 
-        if (x < tamX || x > tamX + TamanhoDoQuadrado || y < tamY || y > tamY + TamanhoDoQuadrado)
-        {
-            return;
-        }
+        int rotaLabirinticas = roubos.Selecionados
+            .Count(x => x is RotaLabirintica);
+
+        if (x < tamX || x > tamX + TamanhoDoQuadrado || y < tamY || y > tamY + TamanhoDoQuadrado) ///implementando rota labirintica 
+            if (!roubos.Selecionados.Any(x => x is RotaLabirintica))
+            {
+                return;
+            }
 
         x = (x - tamX) / tamanhoCelula;
         y = (y - tamY) / tamanhoCelula;
@@ -109,7 +116,7 @@ public class Jogo : Tela
                 jogadaAtual.Add((x, y));
             }
 
-            if (jogadas[x][y] != atual)
+            if (jogadas[x][y] != atual && !roubos.Selecionados.Any(x => x is LinhaInvisivel))
             {
                 atual = null;
                 LimparJogada();
@@ -125,10 +132,13 @@ public class Jogo : Tela
                 return;
             }
         }
-        
+
         if (jogadaAtual.Count == 0)
             return;
-        
+
+        int linhasInvisveis = roubos.Selecionados
+            .Count(x => x is LinhaInvisivel);
+
         var agora = jogadaAtual.First();
         for (int i = 1; i < jogadaAtual.Count; i++)
         {
@@ -140,6 +150,16 @@ public class Jogo : Tela
 
             if (dx + dy > 1)
             {
+                if (linhasInvisveis > 0)
+                {
+                    var medio = jogadas[(agora.x + proximo.x) / 2][(agora.y + proximo.y) / 2];
+                    if (medio is not null && (dx == 0 || dy == 0))
+                    {
+                        agora = proximo;
+                        linhasInvisveis--;
+                        continue;
+                    }
+                }
                 LimparJogada();
                 LimparJogadaAtual();
                 atual = null;
@@ -164,7 +184,7 @@ public class Jogo : Tela
 
         var cor = jogadas[primeiroX][primeiroY];
 
-        if (primeiroX != ultimoX && primeiroY != ultimoY && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
+        if ((primeiroX != ultimoX || primeiroY != ultimoY) && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
         {
             pontuacao.Pontos += 10;
 
@@ -252,56 +272,7 @@ public class Jogo : Tela
             return true;
 
         var (ultimoX, ultimoY) = jogadaAtual.Last();
-        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1 && SemCruzamentos(x, y);
-    }
-
-    public bool SemCruzamentos(int x, int y)
-    {
-        if (jogadaAtual.Count == 0)
-            return true;
-
-        foreach (var tracoExistente in linhaTracada)
-        {
-            if (Cruzam((tracoExistente.incial, tracoExistente.final), (new Point(jogadaAtual.Last().x, jogadaAtual.Last().y), new Point(x, y))))
-            {
-                return true;
-            }
-        }
-
-        return true;
-    }
-
-    private bool Cruzam((Point comeco, Point fim) segmento1, (Point comeco, Point fim) segmento2)
-    {
-        float a1 = segmento1.fim.Y - segmento1.comeco.Y;
-        float b1 = segmento1.comeco.X - segmento1.fim.X;
-        float c1 = a1 * segmento1.comeco.X + b1 * segmento1.comeco.Y;
-
-        float a2 = segmento2.fim.Y - segmento2.comeco.Y;
-        float b2 = segmento2.comeco.X - segmento2.fim.X;
-        float c2 = a2 * segmento2.comeco.X + b2 * segmento2.comeco.Y;
-
-        float delta = a1 * b2 - a2 * b1;
-
-        if (delta == 0)
-        {
-            return false;
-        }
-
-        float intersectX = (b2 * c1 - b1 * c2) / delta;
-        float intersectY = (a1 * c2 - a2 * c1) / delta;
-
-        bool dentroSegmento1 = intersectX >= Math.Min(segmento1.comeco.X, segmento1.fim.X)
-                            && intersectX <= Math.Max(segmento1.comeco.X, segmento1.fim.X)
-                            && intersectY >= Math.Min(segmento1.comeco.Y, segmento1.fim.Y)
-                            && intersectY <= Math.Max(segmento1.comeco.Y, segmento1.fim.Y);
-
-        bool dentroSegmento2 = intersectX >= Math.Min(segmento2.comeco.X, segmento2.fim.X)
-                            && intersectX <= Math.Max(segmento2.comeco.X, segmento2.fim.X)
-                            && intersectY >= Math.Min(segmento2.comeco.Y, segmento2.fim.Y)
-                            && intersectY <= Math.Max(segmento2.comeco.Y, segmento2.fim.Y);
-
-        return dentroSegmento1 && dentroSegmento2;
+        return Math.Abs(x - ultimoX) + Math.Abs(y - ultimoY) == 1;
     }
 
     public void LimparJogadaAtual()
@@ -407,11 +378,14 @@ public class Jogo : Tela
 
         uppop.MouseHover += (sender, e) =>
         {
-            var newTela = new MenuDeRoubo(this);
-            newTela.PictureBox = this.PictureBox;
-            newTela.Graphics = this.Graphics;
-            newTela.Carregar();
-            Program.AtualizarTela(newTela);
+            if (this.roubos.Fundo == null)
+            {
+                this.roubos = new MenuDeRoubo(this);
+                this.roubos.PictureBox = this.PictureBox;
+                this.roubos.Graphics = this.Graphics;
+                this.roubos.Carregar();
+            }
+            Program.AtualizarTela(this.roubos);
         };
 
         PictureBox.Controls.Add(uppop);

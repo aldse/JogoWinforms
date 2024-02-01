@@ -1,123 +1,108 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
-namespace JogoWinforms;
-
-public class Menu : Tela
+namespace JogoWinforms
 {
-    public override void Carregar()
+    public class Menu : Tela
     {
-        Pontuacao pontuacao = new Pontuacao();
+        private Button ngBtn;
+        private Button cntBtn;
+        private Label melhorPontuacaoLabel;
 
-        Image background = Image.FromFile("img/bom1.png");
-        Image jogar = Image.FromFile("img/jogar.png");
-        Image sair = Image.FromFile("img/sair.png");
-
-        MainForm.WindowState = FormWindowState.Maximized;
-        MainForm.FormBorderStyle = FormBorderStyle.None;
-        MainForm.Text = "Joguinho";
-
-        Button ngBtn = new Button();
-        ngBtn.FlatStyle = FlatStyle.Flat;
-        ngBtn.FlatAppearance.BorderSize = 0;
-        ngBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
-        ngBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        ngBtn.BackgroundImage = jogar; // Remova esta linha
-        ngBtn.BackgroundImageLayout = ImageLayout.Stretch;
-        ngBtn.Width = 350;
-        ngBtn.Height = 350;
-        ngBtn.Location = new Point(670, 680);
-        ngBtn.BackColor = Color.Transparent;
-
-
-        // Arredondar os cantos do botão
-        GraphicsPath path = new GraphicsPath();
-        int radius = 10;
-        path.AddArc(0, 0, radius * 2, radius * 2, 180, 90);
-        path.AddArc(ngBtn.Width - 2 * radius, 0, radius * 2, radius * 2, 270, 90);
-        path.AddArc(ngBtn.Width - 2 * radius, ngBtn.Height - 2 * radius, radius * 2, radius * 2, 0, 90);
-        path.AddArc(0, ngBtn.Height - 2 * radius, radius * 2, radius * 2, 90, 90);
-        ngBtn.Region = new Region(path);
-        ngBtn.MouseEnter += (sender, e) =>
+        public override void Carregar()
         {
-            ngBtn.ForeColor = Color.Black;
-        };
+            Pontuacao pontuacao = new Pontuacao();
 
-        ngBtn.MouseLeave += (sender, e) =>
-        {
-            ngBtn.ForeColor = Color.White;
-        };
+            Image background = Image.FromFile("img/bom1.png");
+            Image jogar = Image.FromFile("img/jogar.png");
+            Image sair = Image.FromFile("img/sair.png");
 
-        ngBtn.Click += delegate
-        {
-            Tela tela = new Jogo
+            MainForm.WindowState = FormWindowState.Maximized;
+            MainForm.FormBorderStyle = FormBorderStyle.None;
+            MainForm.Text = "Joguinho";
+
+            // MessageBox.Show($"{PictureBox.Size}"); 1920x1080
+            ngBtn = CriarBotao(jogar, 
+                .18f * PictureBox.Width, 
+                .32f * PictureBox.Height, 
+                .35f * PictureBox.Width,
+                .64f * PictureBox.Height
+            );
+            cntBtn = CriarBotao(sair, 300, 340, 1020, 610);
+
+            melhorPontuacaoLabel = new Label
             {
-                PictureBox = this.PictureBox,
-                MainForm = this.MainForm,
-                Graphics = this.Graphics
+                ForeColor = Color.Black,
+                BackColor = Color.FromArgb(0xBD, 0xD4, 0xC8),
+                Font = new Font("Tw Cen MT Condensed Extra Bold", 20, FontStyle.Regular),
+                Text = "Melhor Pontuação: " + pontuacao.ObterMaiorPontuacao(),
+                AutoSize = true,
+                Location = new Point(1650, 40)
             };
-            tela.Carregar();
-            Program.AtualizarTela(tela);
-            PictureBox.Controls.Clear();
-        };
+            PictureBox.Controls.Add(melhorPontuacaoLabel);
 
-        Button cntBtn = new Button();
-        cntBtn.FlatStyle = FlatStyle.Flat;
-        cntBtn.FlatAppearance.BorderSize = 0;
-        cntBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
-        cntBtn.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        cntBtn.BackgroundImage = sair; // Remova esta linha
-        cntBtn.BackgroundImageLayout = ImageLayout.Stretch;
-        cntBtn.Width = 300;
-        cntBtn.Height = 340;
-        cntBtn.Location = new Point(1020, 610);
-        cntBtn.BackColor = Color.Transparent;
+            PictureBox.BackgroundImageLayout = ImageLayout.Stretch;
+            PictureBox.BackgroundImage = background;
+            PictureBox.Controls.Add(ngBtn);
+            PictureBox.Controls.Add(cntBtn);
+        }
 
-        // Arredondar os cantos do botão
-        GraphicsPath path1 = new GraphicsPath();
-        int radius1 = 20; // Ajuste o raio para arredondar mais ou menos
-        path1.AddArc(0, 0, radius1 * 2, radius1 * 2, 180, 90);
-        path1.AddArc(cntBtn.Width - 2 * radius1, 0, radius1 * 2, radius1 * 2, 270, 90);
-        path1.AddArc(cntBtn.Width - 2 * radius1, cntBtn.Height - 2 * radius1, radius1 * 2, radius1 * 2, 0, 90);
-        path1.AddArc(0, cntBtn.Height - 2 * radius1, radius1 * 2, radius1 * 2, 90, 90);
-        cntBtn.Region = new Region(path1);
-
-        Label melhorPontuacaoLabel = new Label();
-        melhorPontuacaoLabel.ForeColor = Color.Black;
-        melhorPontuacaoLabel.BackColor = Color.FromArgb(0xBD, 0xD4, 0xC8);
-        melhorPontuacaoLabel.Font = new Font("Tw Cen MT Condensed Extra Bold", 20, FontStyle.Regular);
-        melhorPontuacaoLabel.Text = "Melhor Pontuação: " + pontuacao.ObterMaiorPontuacao();
-        melhorPontuacaoLabel.AutoSize = true;
-        melhorPontuacaoLabel.Location = new Point(1650, 40);
-        PictureBox.Controls.Add(melhorPontuacaoLabel);
-
-        cntBtn.MouseEnter += (sender, e) =>
+        private Button CriarBotao(Image imagem, float largura, float altura, float x, float y)
         {
-            cntBtn.ForeColor = Color.Black; // Muda a cor do texto quando o mouse entra no botão
-        };
+            Button botao = new Button
+            {
+                FlatStyle = FlatStyle.Flat,
+                FlatAppearance = { BorderSize = 0, MouseDownBackColor = Color.Transparent, MouseOverBackColor = Color.Transparent },
+                BackgroundImage = imagem,
+                BackgroundImageLayout = ImageLayout.Stretch,
+                Width = (int)largura,
+                Height = (int)altura,
+                Location = new Point((int)x, (int)y),
+                BackColor = Color.Transparent
+            };
 
-        cntBtn.MouseLeave += (sender, e) =>
+            // Arredondar os cantos do botão
+            GraphicsPath path = new GraphicsPath();
+            int raio = 10; // Ajuste o raio para arredondar mais ou menos
+            path.AddArc(0, 0, raio * 2, raio * 2, 180, 90);
+            path.AddArc(botao.Width - 2 * raio, 0, raio * 2, raio * 2, 270, 90);
+            path.AddArc(botao.Width - 2 * raio, botao.Height - 2 * raio, raio * 2, raio * 2, 0, 90);
+            path.AddArc(0, botao.Height - 2 * raio, raio * 2, raio * 2, 90, 90);
+            botao.Region = new Region(path);
+
+            botao.MouseEnter += (sender, e) =>
+            {
+                botao.ForeColor = Color.Black;
+            };
+
+            botao.MouseLeave += (sender, e) =>
+            {
+                botao.ForeColor = Color.White;
+            };
+
+            botao.Click += delegate
+            {
+                Tela tela = new Jogo
+                {
+                    PictureBox = this.PictureBox,
+                    MainForm = this.MainForm,
+                    Graphics = this.Graphics
+                };
+                tela.Carregar();
+                Program.AtualizarTela(tela);
+                PictureBox.Controls.Clear();
+            };
+
+            return botao;
+        }
+
+        public override void OnKeyDown(KeyEventArgs e)
         {
-            cntBtn.ForeColor = Color.White; // Restaura a cor original do texto quando o mouse sai do botão
-        };
-
-        cntBtn.Click += delegate
-        {
-            Application.Exit();
-        };
-
-        PictureBox.BackgroundImageLayout = ImageLayout.Stretch;
-
-        PictureBox.BackgroundImage = background;
-        PictureBox.Controls.Add(ngBtn);
-        PictureBox.Controls.Add(cntBtn);
-    }
-
-    public override void OnKeyDown(KeyEventArgs e)
-    {
-        if (e.KeyCode == Keys.Escape)
-            Application.Exit();
+            if (e.KeyCode == Keys.Escape)
+                Application.Exit();
+        }
     }
 }
