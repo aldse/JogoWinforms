@@ -85,11 +85,12 @@ public class Menu : Tela
         cntBtn.Region = new Region(path1);
 
         Label melhorPontuacaoLabel = new Label();
-        melhorPontuacaoLabel.ForeColor = Color.White;
-        melhorPontuacaoLabel.Font = new Font("Comic Sans MS", 20);
+        melhorPontuacaoLabel.ForeColor = Color.Black;
+        melhorPontuacaoLabel.BackColor = Color.FromArgb(0xBD, 0xD4, 0xC8);
+        melhorPontuacaoLabel.Font = new Font("Tw Cen MT Condensed Extra Bold", 20, FontStyle.Regular);
         melhorPontuacaoLabel.Text = "Melhor Pontuação: " + pontuacao.ObterMaiorPontuacao();
         melhorPontuacaoLabel.AutoSize = true;
-        melhorPontuacaoLabel.Location = new Point(1600, 600);
+        melhorPontuacaoLabel.Location = new Point(1650, 40);
         PictureBox.Controls.Add(melhorPontuacaoLabel);
 
         cntBtn.MouseEnter += (sender, e) =>
