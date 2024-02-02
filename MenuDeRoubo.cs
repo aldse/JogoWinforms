@@ -19,7 +19,6 @@ public class MenuDeRoubo : Tela
     Image sair = Image.FromFile("img/sair.png");
     Jogo fundo = null;
     private List<PictureBox> rouboCards = new List<PictureBox>();
-    private PictureBox cartaArrastada = null;
     public MenuDeRoubo(Jogo fundo)
         => this.fundo = fundo;
     private int animation = 0;

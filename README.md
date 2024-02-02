@@ -4,7 +4,7 @@ Pista Fugaz: Dar uma dica de qual caminho seguir, justo o suficiente para traça
 
 Travessia Dupla: Atravessar duas linhas traçadas.
 
-Inversão de Destino: Mudar a posição das bolinhas.
+Inversão de Destino: Mudar a posição de 1 bolinha.
 
 Túnel Residencial: Criar um túnel, onde a bolinha, ao estar com uma casa na frente dela e m parceiro da mesma cor com uma casa livre na frente, conecta-se.
 
@@ -14,7 +14,7 @@ Fuga Instantânea: Atravessar de um lado para outro quando sai da tela, atravess
 
 Dança das Bolinhas: Dois pares de bolinhas mudam de lugar.
 
-Aniquilação Tática: Apagar um par de bolinhas.
+Aniquilação Tática: Apagar um par de bolinhas. 
 
 Imigrante: Mudar uma bolinha de lugar.
 
