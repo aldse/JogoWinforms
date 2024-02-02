@@ -9,6 +9,7 @@ using JogoWinforms.Roubadas;
 namespace JogoWinforms;
 public class Jogo : Tela
 {
+    private bool imigranteAtivo = false;
     private Random random = new Random();
     MenuDeRoubo roubos = new MenuDeRoubo(null);
     Button uppop;
@@ -51,6 +52,7 @@ public class Jogo : Tela
         PictureBox.Refresh();
     }
     Point clicado = Point.Empty; //empty = vazio
+
     public override void OnMouseDown(MouseEventArgs e)
     {
         clicado = e.Location;
@@ -94,6 +96,26 @@ public class Jogo : Tela
                 }
             }
         }
+
+        if (roubos.Selecionados.Any(x => x is Imigrante))
+        {
+            xClicado = x;
+            yClicado = y;
+            DialogResult result = MessageBox.Show("Deseja usar o roubo 'Imigrante' nesta bola?", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                if (imigranteAtivo)
+                {
+                    MoverBolaParaPosicaoAleatoria(xClicado, yClicado);
+                    imigranteAtivo = false;
+                }
+                else
+                {
+                    imigranteAtivo = true;
+                }
+            }
+        }
     }
     public override void OnMouseUp(MouseEventArgs e)
     {
@@ -101,7 +123,7 @@ public class Jogo : Tela
         isMouseClicado = false;
         this.ValidarJogada();
 
-        if (xClicado != -1 && yClicado != -1)
+        if (imigranteAtivo && xClicado != -1 && yClicado != -1)
         {
             int xDestino = (int)e.X;
             int yDestino = (int)e.Y;
@@ -122,6 +144,7 @@ public class Jogo : Tela
                     xClicado = -1;
                     yClicado = -1;
 
+                    imigranteAtivo = false;
                     PictureBox.Refresh();
                 }
                 else
@@ -168,10 +191,16 @@ public class Jogo : Tela
             .Count(x => x is InversaodeDestino);
 
         int dancadasBolinhas = roubos.Selecionados //FUNCIONA MAS ELE VAI E VAI PRA CIMA DE UMA LINHA TRAÇADA
-               .Count(x => x is DancadasBolinhas);
+            .Count(x => x is DancadasBolinhas);
 
-        int pistaFugaz = roubos.Selecionados
+        int pistaFugaz = roubos.Selecionados //AINDA N TA FEITO
             .Count(x => x is PistaFugaz);
+
+        int imigrante = roubos.Selecionados //FUNCIONA MAS ELE VAI E VAI PRA CIMA DE UMA LINHA TRAÇADA
+            .Count(x => x is Imigrante);
+
+        int travessiaDupla = roubos.Selecionados
+            .Count(x => x is TravessiaDupla);
 
         if (!roubos.Selecionados.Any(x => x is RotaLabirintica))
         {
@@ -239,6 +268,7 @@ public class Jogo : Tela
                 jogadas[x][y] = atual;
                 jogadaAtual.Add((x, y));
             }
+
 
             if (jogadas[x][y] != atual && !roubos.Selecionados.Any(x => x is LinhaInvisivel))
             {
@@ -578,5 +608,7 @@ public class Jogo : Tela
 
         return (x, y);
     }
+
+
 
 }

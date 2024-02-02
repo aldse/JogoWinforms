@@ -11,19 +11,26 @@ namespace JogoWinforms;
 
 public class MenuDeRoubo : Tela
 {
-    public IEnumerable<RoubosJogo> Selecionados => 
+    public IEnumerable<RoubosJogo> Selecionados =>
         escolhasFinais.Where(escolhida => escolhida is not null);
     public Jogo Fundo => fundo;
-
+    private int cardX; // Declarar cardX como campo
+    private int cardY; // Declarar cardY como campo
     Image background = Image.FromFile("img/talvez.png");
     Image sair = Image.FromFile("img/sair.png");
     Jogo fundo = null;
     private List<PictureBox> rouboCards = new List<PictureBox>();
+    private PictureBox cartaArrastada = null;
     public MenuDeRoubo(Jogo fundo)
-        => this.fundo = fundo;
+    {
+        this.fundo = fundo;
+        roubosDisponiveis.AddRange(roubos);
+    }
     private int animation = 0;
     List<RoubosJogo> roubos = new List<RoubosJogo>();
     List<RectangleF> escolhidos = new List<RectangleF>();
+    private List<RoubosJogo> roubosUsados = new List<RoubosJogo>();
+    private List<RoubosJogo> roubosDisponiveis = new List<RoubosJogo>(); // Lista das cartas disponíveis no menu
 
     RoubosJogo[] escolhasFinais = new RoubosJogo[4];
     RoubosJogo[] vetorRooubos = new RoubosJogo[10];
@@ -128,6 +135,7 @@ public class MenuDeRoubo : Tela
             new Imigrante(),
             new LinhaInvisivel()
         };
+    List<RoubosJogo> roubosDisponiveisCopy = new List<RoubosJogo>(roubosDisponiveis);
 
         for (int i = 0; i < 5; i++)
         {
@@ -145,8 +153,20 @@ public class MenuDeRoubo : Tela
                     pb.Width * .05f
             ));
         }
-    }
+        roubosDisponiveis.Clear();
 
+        foreach (var roubo in roubosDisponiveisCopy)
+        {
+            AddCard(cardX, cardY, roubo);
+        }
+    }
+    private void ReabastecerMenu()
+    {
+        foreach (var roubo in roubosDisponiveis)
+        {
+            AddCard(cardX, cardY, roubo);
+        }
+    }
     public override void OnMouseDown(MouseEventArgs e)
     {
         if (!telaPrincipal.Contains(e.Location))
@@ -168,7 +188,7 @@ public class MenuDeRoubo : Tela
     {
         if (cartaEmMovimento is null)
             return;
-        
+
         int i = -1;
         foreach (var caixa in escolhidos)
         {
@@ -177,6 +197,8 @@ public class MenuDeRoubo : Tela
                 continue;
 
             escolhasFinais[i] = cartaEmMovimento;
+            roubosDisponiveis.Remove(cartaEmMovimento);
+
         }
         cartaEmMovimento = null;
         ultimaposicaoMouse = Point.Empty;
@@ -204,10 +226,23 @@ public class MenuDeRoubo : Tela
     {
         if (e.KeyCode == Keys.Escape)
         {
+            ResetRoubadasSelecionadas();
             Program.AtualizarTela(fundo);
         }
     }
 
+    private void ResetRoubadasSelecionadas()
+    {
+        escolhasFinais = new RoubosJogo[4];
+
+        foreach (var roubo in roubos)
+        {
+            roubo.Rectangle = new RectangleF(roubo.OriginalX, roubo.OriginalY, roubo.Rectangle.Width, roubo.Rectangle.Height);
+        }
+
+        // Opcionalmente, redefina a lista de roubadas usadas
+        roubosUsados.Clear();
+    }
     /// <summary>
     ///   cardWidth -> Largura do card 
     ///   cardHeight -> Altura do card
@@ -221,7 +256,6 @@ public class MenuDeRoubo : Tela
         int cardWidth = 200;
         int cardHeight = 200;
         roubo.Rectangle = new RectangleF(cardX, cardY, cardWidth, cardHeight);
-        this.roubos.Add(roubo);
+        roubos.Add(roubo);
     }
-
 }
