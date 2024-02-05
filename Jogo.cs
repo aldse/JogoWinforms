@@ -9,6 +9,7 @@ using JogoWinforms.Roubadas;
 namespace JogoWinforms;
 public class Jogo : Tela
 {
+    private Color? corSelecionada = null;
     private bool imigranteAtivo = false;
     private Random random = new Random();
     MenuDeRoubo roubos = new MenuDeRoubo(null);
@@ -21,6 +22,7 @@ public class Jogo : Tela
     Pontuacao pontuacao = new Pontuacao();
     List<(int x, int y)> bolasMarcadas = new List<(int x, int y)>();
     bool executarDancaDasBolinhas = false;
+    bool executarInversaodeDestino = false;
     List<(int x, int y)> caminhosCompletados = new List<(int x, int y)>();
 
     int xClicado = -1;
@@ -47,6 +49,10 @@ public class Jogo : Tela
         if (executarDancaDasBolinhas)
         {
             executarDancaDasBolinhas = false;
+        }
+        if (executarInversaodeDestino)
+        {
+            executarInversaodeDestino = false;
         }
         this.Desenhar(PictureBox, Graphics);
         PictureBox.Refresh();
@@ -81,7 +87,13 @@ public class Jogo : Tela
             {
                 xClicado = x;
                 yClicado = y;
-                MessageBox.Show("Você clicou em uma bola. Clique novamente para escolher o destino.");
+                DialogResult result = MessageBox.Show("Deseja mover esta bola?", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    executarInversaodeDestino = true;
+                    MoverBola(x, y);
+                }
             }
             if (roubos.Selecionados.Any(x => x is DancadasBolinhas))
             {
@@ -154,6 +166,7 @@ public class Jogo : Tela
             }
         }
     }
+
     /// <summary>
     /// mudar o tamanho e a quantidade para random
     /// </summary>
@@ -178,29 +191,35 @@ public class Jogo : Tela
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
 
-        int AniquilacaoTatica = roubos.Selecionados //FUNCIONA MAS ELE DPS DA PRIMEIRA CLICADA QUALQUER Q PASSA O MOUSE EM CIMA ELE PERGUNTA
+        int AniquilacaoTatica = roubos.Selecionados //FUNCIONA 
             .Count(x => x is AniquilacaoTatica);
 
         int linhasInvisveis = roubos.Selecionados //FUNCIONA
             .Count(x => x is LinhaInvisivel);
 
-        int rotaLabirinticas = roubos.Selecionados  //AINDA N FUNCIONA
-            .Count(x => x is RotaLabirintica);
-
         int inversaodeDestinos = roubos.Selecionados //FUNCIONA
             .Count(x => x is InversaodeDestino);
 
-        int dancadasBolinhas = roubos.Selecionados //FUNCIONA MAS ELE VAI E VAI PRA CIMA DE UMA LINHA TRAÇADA
+        int dancadasBolinhas = roubos.Selecionados //FUNCIONA 
             .Count(x => x is DancadasBolinhas);
 
-        int pistaFugaz = roubos.Selecionados //AINDA N TA FEITO
-            .Count(x => x is PistaFugaz);
-
-        int imigrante = roubos.Selecionados //FUNCIONA MAS ELE VAI E VAI PRA CIMA DE UMA LINHA TRAÇADA
+        int imigrante = roubos.Selecionados //FUNCIONA 
             .Count(x => x is Imigrante);
 
-        int travessiaDupla = roubos.Selecionados
+        int pistaFugaz = roubos.Selecionados //AINDA N FUNCIONA
+            .Count(x => x is PistaFugaz);
+
+        int rotaLabirinticas = roubos.Selecionados  //AINDA N FUNCIONA
+            .Count(x => x is RotaLabirintica);
+
+        int travessiaDupla = roubos.Selecionados //AINDA N FUNCIONA
             .Count(x => x is TravessiaDupla);
+
+        int tunelResidencial = roubos.Selecionados //AINDA N FUNCIONA
+            .Count(x => x is TunelResidencial);
+
+        int fugaInstantanea = roubos.Selecionados //AINDA N FUNCIONA
+        .Count(x => x is FugaInstantanea);
 
         if (!roubos.Selecionados.Any(x => x is RotaLabirintica))
         {
@@ -319,6 +338,27 @@ public class Jogo : Tela
             agora = proximo;
         }
     }
+
+    private void ReposicionarBolas()
+    {
+        int tamanho = bolas.Length;
+
+        for (int x = 0; x < tamanho; x++)
+        {
+            for (int y = 0; y < tamanho; y++)
+            {
+                if (bolas[x][y] == null)
+                {
+                    var novaCor = pegarCor(random);
+                    bolas[x][y] = novaCor;
+                }
+            }
+        }
+    }
+
+    private List<(int x, int y)> bolasDaMesmaCor = new List<(int x, int y)>();
+
+
     /// <summary>
     /// chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
     /// </summary>
@@ -341,7 +381,6 @@ public class Jogo : Tela
             {
                 bolasMarcadas.Add(posicao);
                 caminhosCompletados.Add(posicao);
-
             }
         }
         else
@@ -480,13 +519,10 @@ public class Jogo : Tela
             }
         }
     }
-
     public bool DestinoValido(int origemX, int origemY, int destinoX, int destinoY)
     {
-        // Verifique se o destino é uma célula vazia
         return bolas[destinoX][destinoY] == null;
     }
-
 
     public void DesenharBotao()
     {
@@ -541,8 +577,6 @@ public class Jogo : Tela
 
             (int x, int y) = pegarEspacoVazio(tamanho, alet);
 
-            // Verifique se a posição gerada aleatoriamente já está em caminhosCompletados
-            // Se estiver, continue gerando novas posições até encontrar uma que não esteja na lista
             while (caminhosCompletados.Contains((x, y)))
             {
                 (x, y) = pegarEspacoVazio(tamanho, alet);
@@ -559,7 +593,6 @@ public class Jogo : Tela
 
             bolas[x][y] = color;
         }
-
     }
 
     /// <summary>
@@ -584,17 +617,52 @@ public class Jogo : Tela
         var azul = alet.Next(255);
         return Color.FromArgb(vermelho, verde, azul);
     }
+
+    private void MoverBola(int x, int y)
+    {
+        if (bolas[x][y] != null)
+        {
+            var corBolinhaClicada = bolas[x][y].Value;
+            bolas[x][y] = null;
+
+            (int newX, int newY) = EncontrarPosicao();
+            bolas[newX][newY] = corBolinhaClicada;
+
+            PictureBox.Refresh();
+        }
+    }
+
+
+
     private void MoverBolaParaPosicaoAleatoria(int x, int y)
     {
         var corBolinhaClicada = bolas[x][y].Value;
         bolas[x][y] = null;
 
-        (int newX, int newY) = EncontrarPosicaoVazia();
-        bolas[newX][newY] = corBolinhaClicada;
+        (int newX1, int newY1) = EncontrarPosicaoVazia();
+        bolas[newX1][newY1] = corBolinhaClicada;
+
+        (int newX2, int newY2) = EncontrarPosicaoVazia();
+        bolas[newX2][newY2] = corBolinhaClicada;
+
+        for (int i = 0; i < bolas.Length; i++)
+        {
+            for (int j = 0; j < bolas[i].Length; j++)
+            {
+                if (bolas[i][j] == corBolinhaClicada && (i != x || j != y))
+                {
+                    bolas[i][j] = null;
+                }
+            }
+        }
+        (int newX3, int newY3) = EncontrarPosicaoVazia();
+        bolas[newX3][newY3] = corBolinhaClicada;
+
+        (int newX4, int newY4) = EncontrarPosicaoVazia();
+        bolas[newX4][newY4] = corBolinhaClicada;
 
         PictureBox.Refresh();
     }
-
     private (int x, int y) EncontrarPosicaoVazia()
     {
         int tamanho = bolas.Length;
@@ -608,7 +676,13 @@ public class Jogo : Tela
 
         return (x, y);
     }
+    private (int x, int y) EncontrarPosicao()
+    {
+        int x, y;
 
-
-
+        if (bolas[x][y] != null)
+        {
+            return (x, y);
+        }
+    }
 }

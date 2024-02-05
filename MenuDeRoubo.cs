@@ -14,13 +14,11 @@ public class MenuDeRoubo : Tela
     public IEnumerable<RoubosJogo> Selecionados =>
         escolhasFinais.Where(escolhida => escolhida is not null);
     public Jogo Fundo => fundo;
-    private int cardX; // Declarar cardX como campo
-    private int cardY; // Declarar cardY como campo
+    private int cardX; 
+    private int cardY; 
     Image background = Image.FromFile("img/talvez.png");
     Image sair = Image.FromFile("img/sair.png");
     Jogo fundo = null;
-    private List<PictureBox> rouboCards = new List<PictureBox>();
-    private PictureBox cartaArrastada = null;
     public MenuDeRoubo(Jogo fundo)
     {
         this.fundo = fundo;
@@ -30,10 +28,9 @@ public class MenuDeRoubo : Tela
     List<RoubosJogo> roubos = new List<RoubosJogo>();
     List<RectangleF> escolhidos = new List<RectangleF>();
     private List<RoubosJogo> roubosUsados = new List<RoubosJogo>();
-    private List<RoubosJogo> roubosDisponiveis = new List<RoubosJogo>(); // Lista das cartas disponíveis no menu
+    private List<RoubosJogo> roubosDisponiveis = new List<RoubosJogo>(); 
 
     RoubosJogo[] escolhasFinais = new RoubosJogo[4];
-    RoubosJogo[] vetorRooubos = new RoubosJogo[10];
     int selectedIndex = -1;
     private RoubosJogo cartaEmMovimento = null;
     private Point ultimaposicaoMouse = Point.Empty;
@@ -156,13 +153,6 @@ public class MenuDeRoubo : Tela
         roubosDisponiveis.Clear();
 
         foreach (var roubo in roubosDisponiveisCopy)
-        {
-            AddCard(cardX, cardY, roubo);
-        }
-    }
-    private void ReabastecerMenu()
-    {
-        foreach (var roubo in roubosDisponiveis)
         {
             AddCard(cardX, cardY, roubo);
         }

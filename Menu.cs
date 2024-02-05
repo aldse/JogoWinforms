@@ -25,13 +25,23 @@ namespace JogoWinforms
             MainForm.Text = "Joguinho";
 
             // MessageBox.Show($"{PictureBox.Size}"); 1920x1080
-            ngBtn = CriarBotao(jogar, 
-                .18f * PictureBox.Width, 
-                .32f * PictureBox.Height, 
+            ngBtn = CriarBotao(jogar,
+                .18f * PictureBox.Width,
+                .32f * PictureBox.Height,
                 .35f * PictureBox.Width,
                 .64f * PictureBox.Height
             );
-            cntBtn = CriarBotao(sair, 300, 340, 1020, 610);
+            cntBtn = CriarBotao(sair,
+                .16f * PictureBox.Width,
+                .30f * PictureBox.Height,
+                .53f * PictureBox.Width,
+                .56f * PictureBox.Height
+            );
+
+            cntBtn.Click += (sender, e) =>
+            {
+                Application.Exit();
+            };
 
             melhorPontuacaoLabel = new Label
             {
@@ -52,7 +62,7 @@ namespace JogoWinforms
 
         private Button CriarBotao(Image imagem, float largura, float altura, float x, float y)
         {
-            Button botao = new Button
+            Button entrar = new Button
             {
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 0, MouseDownBackColor = Color.Transparent, MouseOverBackColor = Color.Transparent },
@@ -64,26 +74,17 @@ namespace JogoWinforms
                 BackColor = Color.Transparent
             };
 
-            // Arredondar os cantos do botão
-            GraphicsPath path = new GraphicsPath();
-            int raio = 10; // Ajuste o raio para arredondar mais ou menos
-            path.AddArc(0, 0, raio * 2, raio * 2, 180, 90);
-            path.AddArc(botao.Width - 2 * raio, 0, raio * 2, raio * 2, 270, 90);
-            path.AddArc(botao.Width - 2 * raio, botao.Height - 2 * raio, raio * 2, raio * 2, 0, 90);
-            path.AddArc(0, botao.Height - 2 * raio, raio * 2, raio * 2, 90, 90);
-            botao.Region = new Region(path);
-
-            botao.MouseEnter += (sender, e) =>
+            entrar.MouseEnter += (sender, e) =>
             {
-                botao.ForeColor = Color.Black;
+                entrar.ForeColor = Color.Black;
             };
 
-            botao.MouseLeave += (sender, e) =>
+            entrar.MouseLeave += (sender, e) =>
             {
-                botao.ForeColor = Color.White;
+                entrar.ForeColor = Color.White;
             };
 
-            botao.Click += delegate
+            entrar.Click += delegate
             {
                 Tela tela = new Jogo
                 {
@@ -96,7 +97,7 @@ namespace JogoWinforms
                 PictureBox.Controls.Clear();
             };
 
-            return botao;
+            return entrar;
         }
 
         public override void OnKeyDown(KeyEventArgs e)

@@ -30,7 +30,6 @@ namespace JogoWinforms
             acima.Dock = DockStyle.Fill;
             acima.AutoScroll = true;
 
-
             Controls.Add(acima);
 
             for (int i = 1; i <= 10; i++)
@@ -66,7 +65,6 @@ namespace JogoWinforms
 
             debaixo.Controls.Add(card);
         }
-
         private void CardRouboJogo(RoubosJogo rouboJogo) //so 1 ate agr
         {
             var card = new UserControl();
@@ -88,7 +86,6 @@ namespace JogoWinforms
                     card.DoDragDrop(rouboJogo, DragDropEffects.Move);
                 }
             };
-
             acima.Controls.Add(card);
         }
 
@@ -166,6 +163,5 @@ namespace JogoWinforms
 
             PictureBox.Controls.Add(sair);
         }
-
     }
 }
