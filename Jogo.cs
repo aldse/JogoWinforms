@@ -365,7 +365,8 @@ public class Jogo : Tela
         if ((primeiroX != ultimoX || primeiroY != ultimoY) && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
         {
             pontuacao.Pontos += 10;
-            gameSound.PlayMusic("./assets/sounds/concluido.mp3");
+            gameSound.StopEfeito();
+            gameSound.PlayEfeito("./assets/sounds/concluido.mp3");
 
             foreach (var posicao in jogadaAtual)
             {
@@ -511,7 +512,6 @@ public class Jogo : Tela
             }
         }
     }
-
     public void DesenharBotao(PictureBox pb)
     {
         if (uppop == null)

@@ -11,6 +11,17 @@ namespace JogoWinforms;
 
 public class MenuDeRoubo : Tela
 {
+    public bool PistaFugazUsado { get; set; } = false;
+    public bool TravessiaDuplaUsado { get; set; } = false;
+    public bool InversaodeDestinoUsado { get; set; } = false;
+    public bool TunelResidencialUsado { get; set; } = false;
+    public bool RotaLabirinticaUsado { get; set; } = false;
+    public bool FugaInstantaneaUsado { get; set; } = false;
+    public bool DancadasBolinhasUsado { get; set; } = false;
+    public bool AniquilacaoTaticaUsado { get; set; } = false;
+    public bool ImigranteUsado { get; set; } = false;
+    public bool LinhaInvisivelUsado { get; set; } = false;
+    
     public IEnumerable<RoubosJogo> Selecionados =>
         escolhasFinais.Where(escolhida => escolhida is not null);
     public Jogo Fundo => fundo;

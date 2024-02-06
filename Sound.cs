@@ -4,43 +4,64 @@ using NAudio.Wave;
 
 public class GameSound : IDisposable
 {
-    private WaveOutEvent outputDevice;
+    private WaveOutEvent musicaWaveOut;
+    private WaveOutEvent efeitoWaveOut;
     private AudioFileReader audioFile;
 
     public void PlayMusic(string filePath)
     {
-        if (outputDevice == null)
+        if (musicaWaveOut == null)
         {
-            outputDevice = new WaveOutEvent();
+            musicaWaveOut = new WaveOutEvent();
             audioFile = new AudioFileReader(filePath);
 
-            outputDevice.Init(audioFile);
-            outputDevice.PlaybackStopped += (sender, args) =>
-            {
-                // Reinicia a reprodução quando atinge o fim
-                if (outputDevice != null && audioFile != null)
-                {
-                    audioFile.Position = 0;
-                    outputDevice.Play();
-                }
-            };
+            musicaWaveOut.Init(audioFile);
 
-            outputDevice.Play();
+            audioFile.Volume = 0.2f;
+          
+            musicaWaveOut.Play();
         }
+    }
+    public void PlayEfeito(string filePath)
+    {
+        if (efeitoWaveOut == null)
+        {
+            efeitoWaveOut = new WaveOutEvent();
+            audioFile = new AudioFileReader(filePath);
+
+            efeitoWaveOut.Init(audioFile);
+            audioFile.Volume = 0.8f;
+          
+            efeitoWaveOut.Play();
+        }
+        
     }
 
     public void StopMusic()
     {
-        outputDevice?.Stop();
+        if (musicaWaveOut != null)
+        {
+            musicaWaveOut?.Stop();
+        }
+    }
+    public void StopEfeito()
+    {
+        if (efeitoWaveOut != null)
+        {
+            efeitoWaveOut?.Stop();
+            efeitoWaveOut = null;
+        }
     }
 
     public void Dispose()
     {
-        if (outputDevice != null)
+        if (musicaWaveOut != null || efeitoWaveOut != null)
         {
-            outputDevice.Stop();
-            outputDevice.Dispose();
-            outputDevice = null;
+            musicaWaveOut.Stop();
+            musicaWaveOut.Stop();
+            efeitoWaveOut.Dispose();
+            musicaWaveOut = null;
+            efeitoWaveOut = null;
         }
 
         if (audioFile != null)
