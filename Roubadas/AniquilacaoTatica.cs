@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 35;
             this.Identificacao = "AniquilacaoTatica";
-            this.Foto = Image.FromFile("img/aniquilacaotatica.png");
+            this.Foto = Image.FromFile("./assets/img/aniquilacaotatica.png");
         }
     }
 }

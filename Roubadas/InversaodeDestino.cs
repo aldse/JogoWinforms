@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 11;
             this.Identificacao = "Inversão de Destino";
-            this.Foto = Image.FromFile("img/inversaodedestino.png");
+            this.Foto = Image.FromFile("./assets/img/inversaodedestino.png");
         }
     }
 }

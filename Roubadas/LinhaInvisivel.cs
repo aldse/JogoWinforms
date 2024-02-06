@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 47;
             this.Identificacao = "Linha Invisível";
-            this.Foto = Image.FromFile("img/linhainvisivel.png");
+            this.Foto = Image.FromFile("./assets/img/linhainvisivel.png");
         }
     }
 }

@@ -29,7 +29,7 @@ namespace JogoWinforms
         public void Comecar()
         {
             Pontos = 0;
-            CarregarMelhorPontuacao(); // Carrega a melhor pontuação ao iniciar
+            CarregarMelhorPontuacao();
         }
         private void ChecarPontuacao()
         {

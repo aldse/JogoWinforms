@@ -9,9 +9,11 @@ using JogoWinforms.Roubadas;
 namespace JogoWinforms;
 public class Jogo : Tela
 {
-    private Color? corSelecionada = null;
     private bool imigranteAtivo = false;
     private Random random = new Random();
+    Image fundo = Image.FromFile("./assets/img/fundinho.png");
+    Image botaoMenu = Image.FromFile("./assets/img/btn.png");
+
     MenuDeRoubo roubos = new MenuDeRoubo(null);
     Button uppop;
     Color?[][] bolas;
@@ -23,10 +25,18 @@ public class Jogo : Tela
     List<(int x, int y)> bolasMarcadas = new List<(int x, int y)>();
     bool executarDancaDasBolinhas = false;
     bool executarInversaodeDestino = false;
+    private int xSelecionado = -1;
+    private int ySelecionado = -1;
+
     List<(int x, int y)> caminhosCompletados = new List<(int x, int y)>();
 
     int xClicado = -1;
     int yClicado = -1;
+    bool isMouseClicado = false;
+    Point clicado = Point.Empty; //empty = vazio
+
+    public GameSound gameSound = new GameSound();
+
     public override void OnKeyDown(KeyEventArgs e)
     {
         if (e.KeyCode == Keys.Escape)
@@ -36,7 +46,6 @@ public class Jogo : Tela
             Carregar();
     }
 
-    bool isMouseClicado = false;
     public override void OnMouseMove(MouseEventArgs e)
     {
         if (isMouseClicado)
@@ -45,7 +54,8 @@ public class Jogo : Tela
 
     public override void OnTick()
     {
-        Graphics.Clear(Color.Black);
+        Graphics.DrawImage(fundo, new Rectangle(0, 0, PictureBox.Width, PictureBox.Height));
+
         if (executarDancaDasBolinhas)
         {
             executarDancaDasBolinhas = false;
@@ -57,16 +67,12 @@ public class Jogo : Tela
         this.Desenhar(PictureBox, Graphics);
         PictureBox.Refresh();
     }
-    Point clicado = Point.Empty; //empty = vazio
 
     public override void OnMouseDown(MouseEventArgs e)
     {
         clicado = e.Location;
         isMouseClicado = true;
         this.Jogar((int)e.X, (int)e.Y, PictureBox);
-
-        int AniquilacaoTatica = roubos.Selecionados
-                  .Count(x => x is AniquilacaoTatica);
 
         int TamanhoDoQuadrado = Math.Min(PictureBox.Width, PictureBox.Height) - 300;
         int tamX = (PictureBox.Width - TamanhoDoQuadrado) / 2;
@@ -83,19 +89,22 @@ public class Jogo : Tela
                 yClicado = y;
                 MessageBox.Show("Você clicou em uma bola!");
             }
-            if (roubos.Selecionados.Any(x => x is InversaodeDestino))
+            else if (roubos.Selecionados.Any(x => x is InversaodeDestino))
             {
-                xClicado = x;
-                yClicado = y;
-                DialogResult result = MessageBox.Show("Deseja mover esta bola?", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
+                if (xSelecionado == -1 && ySelecionado == -1)
                 {
-                    executarInversaodeDestino = true;
-                    MoverBola(x, y);
+                    xSelecionado = x;
+                    ySelecionado = y;
+                    MessageBox.Show("Você selecionou uma bola para mover. Clique em outra bola para trocar de posição.");
+                }
+                else
+                {
+                    MoverBola(xSelecionado, ySelecionado, x, y);
+                    xSelecionado = -1;
+                    ySelecionado = -1;
                 }
             }
-            if (roubos.Selecionados.Any(x => x is DancadasBolinhas))
+            else if (roubos.Selecionados.Any(x => x is DancadasBolinhas))
             {
                 xClicado = x;
                 yClicado = y;
@@ -219,7 +228,7 @@ public class Jogo : Tela
             .Count(x => x is TunelResidencial);
 
         int fugaInstantanea = roubos.Selecionados //AINDA N FUNCIONA
-        .Count(x => x is FugaInstantanea);
+            .Count(x => x is FugaInstantanea);
 
         if (!roubos.Selecionados.Any(x => x is RotaLabirintica))
         {
@@ -339,26 +348,6 @@ public class Jogo : Tela
         }
     }
 
-    private void ReposicionarBolas()
-    {
-        int tamanho = bolas.Length;
-
-        for (int x = 0; x < tamanho; x++)
-        {
-            for (int y = 0; y < tamanho; y++)
-            {
-                if (bolas[x][y] == null)
-                {
-                    var novaCor = pegarCor(random);
-                    bolas[x][y] = novaCor;
-                }
-            }
-        }
-    }
-
-    private List<(int x, int y)> bolasDaMesmaCor = new List<(int x, int y)>();
-
-
     /// <summary>
     /// chama no program, validar coisas da jogada: se foi concluído o trajeto de uma bolinha até a outra sem bater em outra linha traçada
     /// </summary>
@@ -376,6 +365,7 @@ public class Jogo : Tela
         if ((primeiroX != ultimoX || primeiroY != ultimoY) && bolas[primeiroX][primeiroY] == cor && bolas[ultimoX][ultimoY] == cor)
         {
             pontuacao.Pontos += 10;
+            gameSound.PlayMusic("./assets/sounds/concluido.mp3");
 
             foreach (var posicao in jogadaAtual)
             {
@@ -385,8 +375,10 @@ public class Jogo : Tela
         }
         else
         {
+
             LimparJogada();
         }
+        gameSound.StopMusic();
         LimparJogadaAtual();
     }
 
@@ -462,7 +454,7 @@ public class Jogo : Tela
 
         g.DrawRectangle(Pens.Black, tamX, tamY, TamanhoDoQuadrado, TamanhoDoQuadrado);
 
-        DesenharBotao();
+        DesenharBotao(this.PictureBox);
         int num = 15;
 
         int tamanhoCelula = TamanhoDoQuadrado / num;
@@ -519,41 +511,45 @@ public class Jogo : Tela
             }
         }
     }
-    public bool DestinoValido(int origemX, int origemY, int destinoX, int destinoY)
-    {
-        return bolas[destinoX][destinoY] == null;
-    }
 
-    public void DesenharBotao()
+    public void DesenharBotao(PictureBox pb)
     {
-        uppop = new Button();
-        uppop.FlatStyle = FlatStyle.Flat;
-        uppop.FlatAppearance.BorderSize = 0;
-        uppop.FlatAppearance.MouseDownBackColor = Color.Transparent;
-        uppop.FlatAppearance.MouseOverBackColor = Color.Transparent;
-        uppop.BackColor = Color.Black;
-        uppop.ForeColor = Color.White;
-        uppop.Font = new Font("Arial", 12);
-        uppop.Text = "Menu";
-        uppop.Size = new Size(200, 30);
-        uppop.Width = 230;
-        uppop.Height = 85;
-        uppop.Location = new Point(PictureBox.Width - 180, PictureBox.Height - 80);
-
-        uppop.MouseHover += (sender, e) =>
+        if (uppop == null)
         {
-            if (this.roubos.Fundo == null)
+            uppop = new Button
             {
-                this.roubos = new MenuDeRoubo(this);
-                this.roubos.PictureBox = this.PictureBox;
-                this.roubos.Graphics = this.Graphics;
-                this.roubos.Carregar();
-            }
-            Program.AtualizarTela(this.roubos);
-        };
+                FlatStyle = FlatStyle.Flat,
+                BackgroundImage = botaoMenu,
+                BackgroundImageLayout = ImageLayout.Stretch,
+                Size = new Size(230, 230),
+                Location = new Point(pb.Width - 230 - 10, pb.Height - 85 - 100), 
+                BackColor = Color.Transparent
+            };
 
-        PictureBox.Controls.Add(uppop);
+            uppop.FlatAppearance.BorderSize = 0;
+            uppop.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            uppop.FlatAppearance.MouseOverBackColor = Color.Transparent;
+
+            uppop.MouseHover += (sender, e) =>
+            {
+                if (this.roubos.Fundo == null)
+                {
+                    this.roubos = new MenuDeRoubo(this);
+                    this.roubos.PictureBox = this.PictureBox;
+                    this.roubos.Graphics = this.Graphics;
+                    this.roubos.Carregar();
+                }
+                Program.AtualizarTela(this.roubos);
+            };
+
+            pb.Controls.Add(uppop);
+        }
+        else
+        {
+            uppop.Location = new Point(pb.Width - 230 - 10, pb.Height - 85 - 100);
+        }
     }
+
 
     /// <summary>
     /// verifica se ele encaixou o atual com o final
@@ -618,21 +614,16 @@ public class Jogo : Tela
         return Color.FromArgb(vermelho, verde, azul);
     }
 
-    private void MoverBola(int x, int y)
+    private void MoverBola(int origemX, int origemY, int destinoX, int destinoY)
     {
-        if (bolas[x][y] != null)
+        if (bolas[origemX][origemY] != null && bolas[destinoX][destinoY] == null)
         {
-            var corBolinhaClicada = bolas[x][y].Value;
-            bolas[x][y] = null;
-
-            (int newX, int newY) = EncontrarPosicao();
-            bolas[newX][newY] = corBolinhaClicada;
-
+            var corBolinhaClicada = bolas[origemX][origemY].Value;
+            bolas[origemX][origemY] = null;
+            bolas[destinoX][destinoY] = corBolinhaClicada;
             PictureBox.Refresh();
         }
     }
-
-
 
     private void MoverBolaParaPosicaoAleatoria(int x, int y)
     {
@@ -675,14 +666,5 @@ public class Jogo : Tela
         } while (bolas[x][y] != null);
 
         return (x, y);
-    }
-    private (int x, int y) EncontrarPosicao()
-    {
-        int x, y;
-
-        if (bolas[x][y] != null)
-        {
-            return (x, y);
-        }
     }
 }

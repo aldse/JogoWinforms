@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 3;
             this.Identificacao = "Travessia Dupla";
-            this.Foto = Image.FromFile("img/travessiadupla1.png");
+            this.Foto = Image.FromFile("./assets/img/travessiadupla1.png");
         }
     }
 }

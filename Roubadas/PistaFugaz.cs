@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 1;
             this.Identificacao = "Pista Fugaz";
-            this.Foto = Image.FromFile("img/pistafugaz2.png");
+            this.Foto = Image.FromFile("./assets/img/pistafugaz2.png");
         }
     }
 }

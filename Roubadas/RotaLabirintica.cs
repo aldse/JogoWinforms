@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 24;
             this.Identificacao = "Rota Labirintica";
-            this.Foto = Image.FromFile("img/rotalabirintica.png");
+            this.Foto = Image.FromFile("./assets/img/rotalabirintica.png");
         }
     }
 }

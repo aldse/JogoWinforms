@@ -8,17 +8,20 @@ namespace JogoWinforms
 {
     public class Menu : Tela
     {
+        public GameSound gameSound = new GameSound();
         private Button ngBtn;
         private Button cntBtn;
         private Label melhorPontuacaoLabel;
 
         public override void Carregar()
         {
+            gameSound.PlayMusic("./assets/sounds/msc.mp3");
+
             Pontuacao pontuacao = new Pontuacao();
 
-            Image background = Image.FromFile("img/bom1.png");
-            Image jogar = Image.FromFile("img/jogar.png");
-            Image sair = Image.FromFile("img/sair.png");
+            Image background = Image.FromFile("./assets/img/bom1.png");
+            Image jogar = Image.FromFile("./assets/img/jogar.png");
+            Image sair = Image.FromFile("./assets/img/sair.png");
 
             MainForm.WindowState = FormWindowState.Maximized;
             MainForm.FormBorderStyle = FormBorderStyle.None;

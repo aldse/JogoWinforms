@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 31;
             this.Identificacao = "Dança das Bolinhas";
-            this.Foto = Image.FromFile("img/dancadasbolinhas.png");
+            this.Foto = Image.FromFile("./assets/img/dancadasbolinhas.png");
         }
     }
 }

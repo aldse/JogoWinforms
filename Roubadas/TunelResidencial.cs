@@ -8,7 +8,7 @@ namespace JogoWinforms.Roubadas
         {
             this.QuantidadeJogadas = 20;
             this.Identificacao = "Tunel Residencial";
-            this.Foto = Image.FromFile("img/tunelresidencial.png");
+            this.Foto = Image.FromFile("./assets/img/tunelresidencial.png");
         }
     }
 }

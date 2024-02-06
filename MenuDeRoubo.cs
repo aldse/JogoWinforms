@@ -14,10 +14,10 @@ public class MenuDeRoubo : Tela
     public IEnumerable<RoubosJogo> Selecionados =>
         escolhasFinais.Where(escolhida => escolhida is not null);
     public Jogo Fundo => fundo;
-    private int cardX; 
-    private int cardY; 
-    Image background = Image.FromFile("img/talvez.png");
-    Image sair = Image.FromFile("img/sair.png");
+    private int cardX;
+    private int cardY;
+    Image background = Image.FromFile("./assets/img/talvez.png");
+    Image sair = Image.FromFile("./assets/img/sair.png");
     Jogo fundo = null;
     public MenuDeRoubo(Jogo fundo)
     {
@@ -28,22 +28,36 @@ public class MenuDeRoubo : Tela
     List<RoubosJogo> roubos = new List<RoubosJogo>();
     List<RectangleF> escolhidos = new List<RectangleF>();
     private List<RoubosJogo> roubosUsados = new List<RoubosJogo>();
-    private List<RoubosJogo> roubosDisponiveis = new List<RoubosJogo>(); 
+    private List<RoubosJogo> roubosDisponiveis = new List<RoubosJogo>();
 
     RoubosJogo[] escolhasFinais = new RoubosJogo[4];
     int selectedIndex = -1;
     private RoubosJogo cartaEmMovimento = null;
     private Point ultimaposicaoMouse = Point.Empty;
     RectangleF telaPrincipal;
+    Image back = Image.FromFile("./assets/img/fundinho.png");
     public override void OnTick()
     {
         const int duration = 10;
         const float propWidth = 0.6f;
         const float propHeight = 0.6f;
-        var g = Graphics;
-        var pb = PictureBox;
 
-        g.Clear(Color.Black);
+        var g = Graphics;
+
+        var pb = PictureBox;
+        if (pb.Image == null)
+        {
+            pb.Image = new Bitmap(pb.Width, pb.Height);
+        }
+        using (var gra = Graphics.FromImage(pb.Image))
+        {
+            gra.Clear(Color.FromArgb(255, 0xC5, 0xD9, 0xCC));
+
+            gra.DrawImage(back, new Rectangle(0, 0, pb.Width, pb.Height));
+        }
+
+        pb.Invalidate();
+
         fundo.Desenhar(PictureBox, Graphics);
 
         int tamanhoXFinal = (int)(pb.Width * propWidth);
@@ -132,7 +146,7 @@ public class MenuDeRoubo : Tela
             new Imigrante(),
             new LinhaInvisivel()
         };
-    List<RoubosJogo> roubosDisponiveisCopy = new List<RoubosJogo>(roubosDisponiveis);
+        List<RoubosJogo> roubosDisponiveisCopy = new List<RoubosJogo>(roubosDisponiveis);
 
         for (int i = 0; i < 5; i++)
         {
@@ -243,8 +257,8 @@ public class MenuDeRoubo : Tela
     {
         var g = Graphics;
         var pb = PictureBox;
-        int cardWidth = 200;
-        int cardHeight = 200;
+        int cardWidth = 200; //.10f
+        int cardHeight = 200; //.10f
         roubo.Rectangle = new RectangleF(cardX, cardY, cardWidth, cardHeight);
         roubos.Add(roubo);
     }
