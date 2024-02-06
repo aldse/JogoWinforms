@@ -4,7 +4,7 @@ Pista Fugaz: Dar uma dica de qual caminho seguir, justo o suficiente para traça
 
 Travessia Dupla: Atravessar duas linhas traçadas.
 
-Inversão de Destino: Mudar a posição de 1 bolinha.
+Inversão de Destino: Mudar a posição de 1 bolinha com outra que você clicar.
 
 Túnel Residencial: Criar um túnel, onde a bolinha, ao estar com uma casa na frente dela e m parceiro da mesma cor com uma casa livre na frente, conecta-se.
 
