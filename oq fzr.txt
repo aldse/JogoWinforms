@@ -1,0 +1,32 @@
+
+Pista Fugaz: Dar uma dica de qual caminho seguir, justo o suficiente para traçar a bolinha que aparece, mas desaparece em 3 segundos.
+
+Travessia Dupla: Atravessar duas linhas traçadas.
+
+Túnel Residencial: Criar um túnel, onde a bolinha, ao estar com uma casa na frente dela e m parceiro da mesma cor com uma casa livre na frente, conecta-se.
+
+- Rota Labiríntica: Atravessar de um lado para outro na mesma linha quando sai da tela, criando uma rota labiríntica.
+
+Fuga Instantânea: Atravessar de um lado para outro quando sai da tela, atravessando uma linha já traçada.
+
+
+//////////////////////////////////////////////////////////////////////////////
+MAS ELE DPS DA PRIMEIRA CLICADA QUALQUER Q PASSA O MOUSE EM CIMA ELE PERGUNTA
+danca das bolinhas <3
+inversao de destinos<3 ELE TA INDO PARA POSICAO ALATORIA E ELE DEVERIA DEIXAR EU ESCOLHER
+imigrante <3 funciona se apertar pela 2 vez 
+aniquilacao <3
+linha invisivel <3
+musica<3
+
+
+A fazer:
+- sai os elementos do menu de roubadas
+- responsivo
+- mudar o formato da linha de quadrado para redondinho, no jogo
+- aparecer os roubos na tela do jogoquando for uando ele vai saindo
+- a pontuacao ser responsavel pela "compra" de roubadas
+- jogo em si esta travando
+- alterar os tamanhos do tabuleiro a cada rodada
+
+
