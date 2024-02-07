@@ -440,7 +440,7 @@ public class Jogo : Tela
         SolidBrush brush = new SolidBrush(Color.White);
 
         int posX = PictureBox.Width - 180;
-        int posY = 10;
+        int posY = 15;
         g.DrawString(textoPontuacao, fonte, brush, posX, posY);
 
         fonte.Dispose();
@@ -453,12 +453,13 @@ public class Jogo : Tela
         int tamX = (pb.Width - TamanhoDoQuadrado) / 2;
         int tamY = (pb.Height - TamanhoDoQuadrado) / 2;
 
+        int num = 15;
+        int tamanhoCelula = TamanhoDoQuadrado / num;
+
         g.DrawRectangle(Pens.Black, tamX, tamY, TamanhoDoQuadrado, TamanhoDoQuadrado);
 
         DesenharBotao(this.PictureBox);
-        int num = 15;
 
-        int tamanhoCelula = TamanhoDoQuadrado / num;
 
         for (int i = 0; i < num; i++)
         {
@@ -532,6 +533,7 @@ public class Jogo : Tela
 
             uppop.MouseHover += (sender, e) =>
             {
+                 
                 if (this.roubos.Fundo == null)
                 {
                     this.roubos = new MenuDeRoubo(this);

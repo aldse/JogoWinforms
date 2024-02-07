@@ -4,8 +4,11 @@ using System.Linq;
 using System.Windows.Forms;
 using JogoWinforms.Roubadas;
 
+using System.IO;
+
 using System;
 using System.Drawing.Drawing2D;
+using System.Xml.Linq;
 
 namespace JogoWinforms;
 
@@ -21,12 +24,12 @@ public class MenuDeRoubo : Tela
     public bool AniquilacaoTaticaUsado { get; set; } = false;
     public bool ImigranteUsado { get; set; } = false;
     public bool LinhaInvisivelUsado { get; set; } = false;
-    
+
     public IEnumerable<RoubosJogo> Selecionados =>
         escolhasFinais.Where(escolhida => escolhida is not null);
     public Jogo Fundo => fundo;
-    private int cardX;
-    private int cardY;
+    private float cardX;
+    private float cardY;
     Image background = Image.FromFile("./assets/img/talvez.png");
     Image sair = Image.FromFile("./assets/img/sair.png");
     Jogo fundo = null;
@@ -47,6 +50,9 @@ public class MenuDeRoubo : Tela
     private Point ultimaposicaoMouse = Point.Empty;
     RectangleF telaPrincipal;
     Image back = Image.FromFile("./assets/img/fundinho.png");
+
+    Pontuacao pontuacao = new Pontuacao();
+
     public override void OnTick()
     {
         const int duration = 10;
@@ -141,8 +147,8 @@ public class MenuDeRoubo : Tela
 
         int tamanhoXFinal = (int)(pb.Width * propWidth);
         int restoX = pb.Width - tamanhoXFinal;
-        int cardX = restoX / 2 + 37;
-        int cardYTop = 250;
+        float cardX = restoX / 2 + 37;
+        float cardYTop = 250; //250
 
         List<RoubosJogo> tiposDeRoubos = new List<RoubosJogo>
         {
@@ -161,8 +167,8 @@ public class MenuDeRoubo : Tela
 
         for (int i = 0; i < 5; i++)
         {
-            AddCard(cardX + i * 220, cardYTop, tiposDeRoubos[i]);
-            AddCard(cardX + i * 220, cardYTop + 220, tiposDeRoubos[i + 5]);
+            AddCard(cardX + i * 220, cardYTop, tiposDeRoubos[i]); //.11f
+            AddCard(cardX + i * 220, cardYTop + 220, tiposDeRoubos[i + 5]); //.11f .20f
         }
 
         for (int i = 0; i < 4; i++)
@@ -182,19 +188,35 @@ public class MenuDeRoubo : Tela
             AddCard(cardX, cardY, roubo);
         }
     }
+
+
     public override void OnMouseDown(MouseEventArgs e)
     {
-        if (!telaPrincipal.Contains(e.Location))
-            Program.AtualizarTela(fundo);
+        int lendo;
+        using (StreamReader sr = new StreamReader("./bin/Debug/net7.0-windows/melhorpontuacao.txt"))
+        {
+            lendo = sr.Read();
+        }
+
+            if (!telaPrincipal.Contains(e.Location))
+                Program.AtualizarTela(fundo);
 
         for (int i = 0; i < roubos.Count; i++)
         {
             if (roubos[i].Rectangle.Contains(e.Location))
             {
-                cartaEmMovimento = roubos[i];
-                ultimaposicaoMouse = e.Location;
-                selectedIndex = i;
-                break;
+                if (lendo < roubos[i].QuantidadeJogadas)
+                {
+                    cartaEmMovimento = roubos[i];
+                    ultimaposicaoMouse = e.Location;
+                    selectedIndex = i;
+                    break;
+                }
+                else
+                {
+                    MessageBox.Show("Sua pontuação atual não é suficiente para selecionar esta carta.");
+                    return;
+                }
             }
         }
     }
@@ -241,35 +263,23 @@ public class MenuDeRoubo : Tela
     {
         if (e.KeyCode == Keys.Escape)
         {
-            ResetRoubadasSelecionadas();
             Program.AtualizarTela(fundo);
         }
     }
 
-    private void ResetRoubadasSelecionadas()
-    {
-        escolhasFinais = new RoubosJogo[4];
 
-        foreach (var roubo in roubos)
-        {
-            roubo.Rectangle = new RectangleF(roubo.OriginalX, roubo.OriginalY, roubo.Rectangle.Width, roubo.Rectangle.Height);
-        }
-
-        // Opcionalmente, redefina a lista de roubadas usadas
-        roubosUsados.Clear();
-    }
     /// <summary>
     ///   cardWidth -> Largura do card 
     ///   cardHeight -> Altura do card
     ///   cardX -> Posição X do card branco
     ///   cardY -> Posição Y do card branco
     /// </summary>
-    private void AddCard(int cardX, int cardY, RoubosJogo roubo)
+    private void AddCard(float cardX, float cardY, RoubosJogo roubo)
     {
         var g = Graphics;
         var pb = PictureBox;
-        int cardWidth = 200; //.10f
-        int cardHeight = 200; //.10f
+        float cardWidth = 200; //.10f
+        float cardHeight = 200; //.18f
         roubo.Rectangle = new RectangleF(cardX, cardY, cardWidth, cardHeight);
         roubos.Add(roubo);
     }
